@@ -25,25 +25,25 @@
                 <form action="" method="get">
                     <table class="table">
                         <tr>
-                            <td>{{ machineform.hostname.label}}</td><td>{{machineform.hostname}}</td>
-                            <td>{{ machineform.status.label }}</td><td>{{machineform.status}}</td>
+                            <td>{{ machine_form.hostname.label}}</td><td>{{machine_form.hostname}}</td>
+                            <td>{{ machine_form.status.label }}</td><td>{{machine_form.status}}</td>
                         </tr>
                         <tr>
-                            <td>{{ machineform.cpu_model.label }}</td><td>{{machineform.cpu_model}}</td>
-                            <td>{{ machineform.num_cpus.label }}</td><td>{{machineform.num_cpus}}</td>
+                            <td>{{ machine_form.cpu_model.label }}</td><td>{{machine_form.cpu_model}}</td>
+                            <td>{{ machine_form.num_cpus.label }}</td><td>{{machine_form.num_cpus}}</td>
                         </tr>
                         <tr>
-                            <td>{{ machineform.mem_total.label }}</td><td>{{ machineform.mem_total }}</td>
-                            <td>{{ machineform.os.label }}</td><td>{{machineform.os}}</td>
+                            <td>{{ machine_form.mem_total.label }}</td><td>{{ machine_form.mem_total }}</td>
+                            <td>{{ machine_form.os.label }}</td><td>{{machine_form.os}}</td>
 
                         </tr>
                         <tr>
-                            <td>{{ machineform.productname.label }}</td><td>{{machineform.productname}}</td>
-                            <td>{{ machineform.manufacturer.label }}</td><td>{{machineform.manufacturer}}</td>
+                            <td>{{ machine_form.productname.label }}</td><td>{{machine_form.productname}}</td>
+                            <td>{{ machine_form.manufacturer.label }}</td><td>{{machine_form.manufacturer}}</td>
 
                         </tr>
                         <tr>
-                            <td>{{ machineform.ip.label }}</td><td>{{machineform.ip}}</td>
+                            <td>{{ machine_form.ip.label }}</td><td>{{machine_form.ip}}</td>
                             <td></td><td></td>
                         </tr>
                         <input class="btn btn-primary" type="submit" value="提交查询"></input>
@@ -73,7 +73,7 @@
                         <th colspan="3">Actions </th>
                     </tr>
                     </thead>
-                    {% for item in list_items %}
+                    {% for item in machine_list %}
                         <tr>
                             <td>  {{item.hostname}}</td>
                             <td>  {{item.status}}</td>
@@ -98,16 +98,16 @@
                 </table>
 
                 <div align="center">
-                    {% if list_items.has_previous %}
-                        <a href="?page={{ list_items.previous_page_number }}">Previous</a>
+                    {% if machine_list.has_previous %}
+                        <a href="?page={{ machine_list.previous_page_number }}">Previous</a>
                     {% endif %}
 
                     <span class="current">
-                        Page {{ list_items.number }} of {{ list_items.paginator.num_pages }}.
+                        Page {{ machine_list.number }} of {{ machine_list.paginator.num_pages }}.
                     </span>
 
-                    {% if list_items.has_next %}
-                        <a href="?page={{ list_items.next_page_number }}">Next</a>
+                    {% if machine_list.has_next %}
+                        <a href="?page={{ machine_list.next_page_number }}">Next</a>
                     {% endif %}
                     <span><p>Total:{{ count }}</p></span>
                 </div>

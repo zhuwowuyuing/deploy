@@ -3,9 +3,12 @@
 
 __author__ = 'liangnaihua'
 
-from models import *
 from django.shortcuts import render
 from django.core.paginator import Paginator
+from django.db.models.query import QuerySet
+from models import BaseInfo, DiskInfo, NetworkInfo, ErrorInfo
+from forms import SearchMachineForm
+
 
 def index(request):
     return render(request,'index.html')
@@ -13,11 +16,11 @@ def index(request):
 
 # 获取服务器信息
 # tmp是存储服务器信息的字典，并将当前值加入到info列表
-def getmachineinfo():
-    info = []
-    # machineSet = BaseInfo.objects.all()
+def get_machine_info(queryset):
+    machine_list = []
     # for machine in BaseInfo.objects.all().order_by('hostname'):
-    for machine in BaseInfo.objects.filter(hostname__contains='is13084905-06'):
+    # for machine in BaseInfo.objects.filter(hostname__contains='is13084905-06'):
+    for machine in queryset:
         tmp                        = {}
         tmp['hostname']            = machine.hostname
         tmp['status']              = machine.status
@@ -29,22 +32,57 @@ def getmachineinfo():
         tmp['manufacturer']        = machine.manufacturer
         tmp['disks']               = machine.disks.all().order_by('mount')
         tmp['interfaces']          = machine.interfaces.all().order_by('interface')
-        info.append(tmp)
+        machine_list.append(tmp)
 
-    return info
+    return machine_list
 
 # 获取服务器信息，并汇总展示
 def names(request):
+    # for machine in BaseInfo.objects.all().order_by('hostname'):
+    # for machine in BaseInfo.objects.filter(hostname__contains='is13084905-06'):
     page_title='服务器汇总信息'
-    info = getmachineinfo()
+    machine_list = get_machine_info(BaseInfo.objects.filter(hostname__contains='is13084905-06'))
     return render(request, 'servers/names.html', locals())
 
 # 获取服务器信息，列表展示
-def serverlist(request):
+def server_list(request):
     page_title='服务器列表'
-    info = getmachineinfo()
-    count = len(info)
-    paginator = Paginator(info ,15)
+    if request.method == "GET":
+        machine_form = SearchMachineForm(request.GET)
+        if machine_form.is_valid():
+            form_data       = machine_form.cleaned_data
+            hostname        = form_data.get('hostname', '')
+            status          = form_data.get('hostname', '')
+            cpu_model       = form_data.get('hostname', '')
+            num_cpus        = form_data.get('hostname', '')
+            mem_total       = form_data.get('mem_total', '')
+            os              = form_data.get('os', '')
+            productname     = form_data.get('productname', '')
+            manufacturer    = form_data.get('manufacturer', '')
+            ipaddr          = form_data.get('ipaddr', '')
+
+            if len(ipaddr) == 0:
+                queryset = BaseInfo.objects.filter(hostname__icontains=hostname,
+                                                     status__icontains=status,
+                                                     cpu_model__icontains=cpu_model,
+                                                     num_cpus__icontains=num_cpus,
+                                                     mem_total__icontains=mem_total,
+                                                     os__icontains=os,
+                                                     productname__icontains=productname,
+                                                     manufacturer__icontains=manufacturer)
+            else:
+                hostname_list = []
+                for item in NetworkInfo.objects.filter(ipaddr__icontains=ipaddr).order_by("hostname_id"):
+                    hostname_list.append(item.hostname)
+                hostname_set = list(set(hostname_list))
+
+
+
+
+
+    machine_list = get_machine_info()
+    count = len(machine_list)
+    paginator = Paginator(machine_list ,15)
 
     try:
         page = int(request.GET.get('page', '1'))
@@ -52,9 +90,9 @@ def serverlist(request):
         page = 1
 
     try:
-        list_items = paginator.page(page)
+        machine_list = paginator.page(page)
     except :
-        list_items = paginator.page(paginator.num_pages)
+        machine_list = paginator.page(paginator.num_pages)
 
     return render(request, 'servers/list.html', locals())
 

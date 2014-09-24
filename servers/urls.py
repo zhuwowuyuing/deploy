@@ -4,5 +4,5 @@ from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('',
     url(r'names/', 'servers.views.names'),
-    url(r'serverlist/', 'servers.views.serverlist'),
+    url(r'list/', 'servers.views.server_list'),
 )

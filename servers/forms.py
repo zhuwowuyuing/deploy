@@ -1,16 +1,16 @@
+#coding=utf8
 __author__ = 'liangnaihua'
 
-from django.conf.urls import patterns, include, url
+from django import forms
+#from models import *
 
-from django.contrib import admin
-admin.autodiscover()
-
-urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'salt_MachineInfo.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-
-    url(r'index/', 'servers.views.index'),
-    url(r'names/', 'servers.views.names'),
-    url(r'serverlist/', 'servers.views.serverslist'),
-)
+class SearchMachineForm(forms.Form):
+    hostname    = forms.CharField(label='主机名')
+    status      = forms.CharField(label='状态')
+    cpu_model   = forms.CharField(label='CPU 型号')
+    num_cpus    = forms.IntegerField(label='CPU 数量')
+    mem_total   = forms.IntegerField(label='内存')
+    os          = forms.CharField(label='操作系统')
+    productname = forms.CharField(label='服务器型号')
+    manufacturer= forms.CharField(label='品牌')
+    ipaddr      = forms.CharField(label='IP地址')
