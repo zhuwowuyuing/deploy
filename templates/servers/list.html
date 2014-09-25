@@ -5,18 +5,6 @@
 {% endblock %}
 
 
-    hostname    = forms.CharField(label='主机名')
-    status      = forms.CharField(label='状态')
-    cpu_model   = forms.CharField(label='CPU 型号')
-    num_cpus    = forms.IntegerField(label='CPU 数量')
-    mem_total   = forms.IntegerField(label='内存')
-    os          = forms.CharField(label='操作系统')
-    productname = forms.CharField(label='服务器型号')
-    manufacturer= forms.CharField(label='品牌')
-    ip          = forms.CharField(lable='IP地址')
-
-
-
 {% block content %}
 <div class="row-fluid">
         <div class="block">
@@ -43,7 +31,7 @@
 
                         </tr>
                         <tr>
-                            <td>{{ machine_form.ip.label }}</td><td>{{machine_form.ip}}</td>
+                            <td>{{ machine_form.ipaddr.label }}</td><td>{{machine_form.ipaddr}}</td>
                             <td></td><td></td>
                         </tr>
                         <input class="btn btn-primary" type="submit" value="提交查询"></input>
@@ -66,6 +54,7 @@
                         <th>状态</th>
                         <th>CPU型号</th>
                         <th>CPU核数</th>
+                        <th>内存</th>
                         <th>操作系统</th>
                         <th>型号</th>
                         <th>品牌</th>
@@ -73,12 +62,14 @@
                         <th colspan="3">Actions </th>
                     </tr>
                     </thead>
+                    {% load measure %}
                     {% for item in machine_list %}
                         <tr>
                             <td>  {{item.hostname}}</td>
                             <td>  {{item.status}}</td>
                             <td>  {{item.cpu_model}}</td>
                             <td>  {{item.num_cpus}}</td>
+                            <td>  {{item.mem_total | memmeasure}}</td>
                             <td>  {{item.os}}</td>
                             <td>  {{item.productname}}</td>
                             <td>  {{item.manufacturer}}</td>
@@ -87,19 +78,14 @@
                                     <p>{{ network.interface }}:{{ network.ipaddr }}</p>
                                 {% endfor %}
                             </td>
-                            <td><a href="">Show</a> </td>
-                            <td><a href="">Edit</a></td>
+                            <td><a href="{% url "servers.views.server_view" item.hostname %}">Show</a> </td>
                         </tr>
                     {% endfor %}
-                    <tr>
-                        <td colspan="3"> <a href="">Add New</a></td>
-                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
                 </table>
 
                 <div align="center">
                     {% if machine_list.has_previous %}
-                        <a href="?page={{ machine_list.previous_page_number }}">Previous</a>
+                        <a href="?hostname={{ hostname }}&status={{ status }}&cpu_model={{ cpu_model }}&num_cpus={{ num_cpus }}&mem_total={{ mem_total }}&os={{ os }}&productname={{ productname }}&manufacturer={{ manufacturer }}&ipaddr={{ ipaddr }}&page={{ machine_list.previous_page_number }}">Previous</a>
                     {% endif %}
 
                     <span class="current">
@@ -107,7 +93,7 @@
                     </span>
 
                     {% if machine_list.has_next %}
-                        <a href="?page={{ machine_list.next_page_number }}">Next</a>
+                        <a href="?hostname={{ hostname }}&status={{ status }}&cpu_model={{ cpu_model }}&num_cpus={{ num_cpus }}&mem_total={{ mem_total }}&os={{ os }}&productname={{ productname }}&manufacturer={{ manufacturer }}&ipaddr={{ ipaddr }}&page={{ machine_list.next_page_number }}">Next</a>
                     {% endif %}
                     <span><p>Total:{{ count }}</p></span>
                 </div>

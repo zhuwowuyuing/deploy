@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="well">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#home" data-toggle="tab">服务器详情</a></li>
+            <li><a href="#man_info" data-toggle="tab">管理信息</a></li>
+        </ul>
+
+        <div id="server_view" class="tab-content">
+            <div class="tab-pane active in" id="home">
+                {% load measure %}
+                {% for item in machine_instance %}
+                    <table class="table table-bordered ">
+                        <tr><td><strong>主机名：</strong></span></td></td><td>{{ item.hostname }}</td></tr>
+                        <tr><td><strong>状态：</strong></td><td>{{ item.status }}</td></tr>
+                        <tr><td><strong>CPU型号：</strong></td><td>{{ item.cpu_model }}</td></tr>
+                        <tr><td><strong>CPU核数：</strong></td><td>{{ item.num_cpus }}</td></tr>
+                        <tr><td><strong>内存：</strong></td><td>{{ item.mem_total | memmeasure }}</td></tr>
+                        <tr><td><strong>操作系统：</strong></td><td>{{ item.os }}</td></tr>
+                        <tr><td><strong>型号：</strong></td><td>{{ item.productname }}</td></tr>
+                        <tr><td><strong>品牌：</strong></td><td>{{ item.manufacturer }}</td></tr>
+                        {% for disk in item.disks %}
+                            <tr><td><strong>磁盘{{ disk.mount }}:</strong></td><td>{{ disk.available | diskmeasure }}/{{ disk.total | diskmeasure}} </td></tr>
+                        {% endfor %}
+                        {% for network in item.interfaces %}
+                            <tr><td><strong>{{ network.interface }} IP地址：</strong></td><td>{{ network.ipaddr }}</td></tr>
+                            <tr><td><strong>{{ network.interface }} MAC地址：</strong></td><td>{{ network.hwaddr }}</td></tr>
+                        {% endfor %}
+                    </table>
+                {% endfor %}
+            </div>
+
+            <div class="tab-pane fade" id="man_info">
+
+                <table class="table table-bordered">
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
