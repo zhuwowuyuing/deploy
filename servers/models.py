@@ -7,6 +7,7 @@ class BaseInfo(models.Model):
     class Meta:
         verbose_name = '基本信息'
         verbose_name_plural = verbose_name
+        ordering = ['hostname']
 
     hostname            = models.CharField('主机名',max_length=60, primary_key=True)
     status              = models.CharField('状态', max_length=20)
@@ -24,6 +25,7 @@ class DiskInfo(models.Model):
     class Meta:
         verbose_name = '磁盘信息'
         verbose_name_plural = verbose_name
+        ordering = ['hostname', 'mount']
 
     hostname            = models.ForeignKey(BaseInfo,related_name="disks")
     mount               = models.CharField('状态', max_length=60)
@@ -37,6 +39,7 @@ class NetworkInfo(models.Model):
     class Meta:
         verbose_name = '网卡信息'
         verbose_name_plural = verbose_name
+        ordering = ['hostname', 'interface']
 
     hostname            = models.ForeignKey(BaseInfo,related_name="interfaces")
     interface           = models.CharField('网络接口', max_length=60)

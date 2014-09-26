@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+{% endblock %}
+
+
+{% block content %}
+    <table class="table table-bordered">
+        <thead>
+        <strong>
+        <th>#</th>
+        <th>主机名</th>
+        <th>错误信息</th>
+        </strong>
+        </thead>
+        <tbody>
+        {% for item in errors %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ item.hostname}}</td>
+            <td>{{ item.info }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

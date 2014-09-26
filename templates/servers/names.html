@@ -13,14 +13,14 @@
             <tr><td>状态：</td><td>{{ item.status }}</td></tr>
             <tr><td>CPU型号：</td><td>{{ item.cpu_model }}</td></tr>
             <tr><td>CPU核数：</td><td>{{ item.num_cpus }}</td></tr>
-            <tr><td>内存：</td><td>{{ item.num_cpus | memmeasure }}</td></tr>
+            <tr><td>内存：</td><td>{{ item.mem_total | memmeasure }}</td></tr>
             <tr><td>操作系统：</td><td>{{ item.os }}</td></tr>
             <tr><td>型号：</td><td>{{ item.productname }}</td></tr>
             <tr><td>品牌：</td><td>{{ item.manufacturer }}</td></tr>
-            {% for disk in item.disks %}
+            {% for disk in item.disks.all %}
                 <tr><td>磁盘{{ disk.mount }}:</td><td>{{ disk.available | diskmeasure }}/{{ disk.total | diskmeasure }} (可用/总量)</td></tr>
             {% endfor %}
-            {% for network in item.interfaces %}
+            {% for network in item.interfaces.all %}
                 <tr><td>{{ network.interface }} IP地址： </td><td>{{ network.ipaddr }}</td></tr>
                 <tr><td>{{ network.interface }} MAC地址：</td><td>{{ network.hwaddr }}</td></tr>
             {% endfor %}

@@ -63,7 +63,26 @@
                     </tr>
                     </thead>
                     {% load measure %}
-                    {% for item in machine_list %}
+{#                    {% for item in machine_list %}#}
+{#                        <tr>#}
+{#                            <td>  {{item.hostname}}</td>#}
+{#                            <td>  {{item.status}}</td>#}
+{#                            <td>  {{item.cpu_model}}</td>#}
+{#                            <td>  {{item.num_cpus}}</td>#}
+{#                            <td>  {{item.mem_total | memmeasure}}</td>#}
+{#                            <td>  {{item.os}}</td>#}
+{#                            <td>  {{item.productname}}</td>#}
+{#                            <td>  {{item.manufacturer}}</td>#}
+{#                            <td>#}
+{#                                {% for network in item.interfaces %}#}
+{#                                    <p>{{ network.interface }}:{{ network.ipaddr }}</p>#}
+{#                                {% endfor %}#}
+{#                            </td>#}
+{#                            <td><a href="{% url "servers.views.server_view" item.hostname %}">Show</a> </td>#}
+{#                        </tr>#}
+{#                    {% endfor %}#}
+
+                {% for item in machine_list %}
                         <tr>
                             <td>  {{item.hostname}}</td>
                             <td>  {{item.status}}</td>
@@ -74,7 +93,7 @@
                             <td>  {{item.productname}}</td>
                             <td>  {{item.manufacturer}}</td>
                             <td>
-                                {% for network in item.interfaces %}
+                                {% for network in item.interfaces.all %}
                                     <p>{{ network.interface }}:{{ network.ipaddr }}</p>
                                 {% endfor %}
                             </td>

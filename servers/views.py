@@ -14,32 +14,31 @@ def index(request):
     return render(request,'index.html')
 
 
-# 获取服务器信息
-# tmp是存储服务器信息的字典，并将当前值加入到info列表
-def get_machine_info(queryset):
-    machine_list = []
-    for machine in queryset:
-        tmp                        = {}
-        tmp['hostname']            = machine.hostname
-        tmp['status']              = machine.status
-        tmp['cpu_model']           = machine.cpu_model
-        tmp['num_cpus']            = machine.num_cpus
-        tmp['mem_total']           = machine.mem_total
-        tmp['os']                  = machine.os
-        tmp['productname']         = machine.productname
-        tmp['manufacturer']        = machine.manufacturer
-        tmp['disks']               = machine.disks.all().order_by('mount')
-        tmp['interfaces']          = machine.interfaces.all().order_by('interface')
-        machine_list.append(tmp)
-
-    return machine_list
+# # 获取服务器信息
+# # tmp是存储服务器信息的字典，并将当前值加入到info列表
+# def get_machine_info(queryset):
+#     machine_list = []
+#     for machine in queryset:
+#         tmp                        = {}
+#         tmp['hostname']            = machine.hostname
+#         tmp['status']              = machine.status
+#         tmp['cpu_model']           = machine.cpu_model
+#         tmp['num_cpus']            = machine.num_cpus
+#         tmp['mem_total']           = machine.mem_total
+#         tmp['os']                  = machine.os
+#         tmp['productname']         = machine.productname
+#         tmp['manufacturer']        = machine.manufacturer
+#         tmp['disks']               = machine.disks.all().order_by('mount')
+#         tmp['interfaces']          = machine.interfaces.all().order_by('interface')
+#         machine_list.append(tmp)
+#
+#     return machine_list
 
 # 获取服务器信息，并汇总展示
 def names(request):
-    # for machine in BaseInfo.objects.all().order_by('hostname'):
-    # for machine in BaseInfo.objects.filter(hostname__contains='is13084905-06'):
     page_title='服务器汇总信息'
-    machine_list = get_machine_info(BaseInfo.objects.filter(hostname__contains='is13084905-06'))
+    machine_list = BaseInfo.objects.all()
+    # machine_list = BaseInfo.objects.filter(hostname__contains='is13084905-06')
     return render(request, 'servers/names.html', locals())
 
 # 获取服务器信息，列表展示
@@ -54,14 +53,13 @@ def server_list(request):
             cpu_model       = form_data.get('cpu_model', '')
             num_cpus        = '' if form_data.get('num_cpus',0 ) == None else int(form_data.get('num_cpus',0 ))
             mem_total       = '' if form_data.get('mem_total',0 ) == None else int(form_data.get('mem_total',0 ))
-            # num_cpus        = form_data.get('num_cpus','' )
-            # mem_total       = form_data.get('mem_total','' )
             os              = form_data.get('os', '')
             productname     = form_data.get('productname', '')
             manufacturer    = form_data.get('manufacturer', '')
             ipaddr          = form_data.get('ipaddr', '')
 
-            queryset = BaseInfo.objects.filter(hostname__icontains=hostname,
+            # 根据相关信息过滤得到QuerySet：machine_list, 由于得到queryset有重复，需要distinct()
+            machine_list = BaseInfo.objects.filter(hostname__icontains=hostname,
                                                 status__icontains=status,
                                                 os__icontains=os,
                                                 productname__icontains=productname,
@@ -69,13 +67,14 @@ def server_list(request):
                                                 interfaces__ipaddr__icontains=ipaddr
                                                 ).distinct()
 
+            # 如果mem_total 和 num_cpus 有值，再次进行过滤
             if mem_total:
-                queryset = queryset.filter(mem_total=mem_total)
+                machine_list = machine_list.filter(mem_total=mem_total)
 
             if num_cpus:
-                queryset = queryset.filter(num_cpus=num_cpus)
+                machine_list = machine_list.filter(num_cpus=num_cpus)
 
-            machine_list = get_machine_info(queryset.order_by('hostname'))
+            #分页
             count = len(machine_list)
             paginator = Paginator(machine_list ,15)
 
@@ -94,29 +93,14 @@ def server_list(request):
         machine_form = SearchMachineForm()
         return render(request, 'servers/list.html', locals())
 
+# 服务器详细信息
 def server_view(request, hostname):
     page_title='服务器详情'
-    tmp = []
     machine_instance = BaseInfo.objects.get(hostname=hostname)
-    tmp.append(machine_instance)
-    machine_instance = get_machine_info(tmp)
     return render(request, 'servers/view.html', locals())
 
-
-
-# def view_servers(request, asset):
-#     page_title='服务器详情'
-#     servers_instance = Servers.objects.get(asset = asset)
-#     form = ServersForm(None, instance = servers_instance)
-#     # form.fields['asset'].widget.attrs['readonly'] = True
-#     for field in servers_instance._meta.get_all_field_names():
-#         if field != 'status':
-#             form.fields[field].widget.attrs['readonly'] = True
-#         else:
-#             form.fields[field].widget.attrs['disabled'] = True
-#
-#     list_log = ModLog.objects.filter(asset = asset, typename="Servers").order_by('-mtime')
-#     t=get_template('assets/view_servers.html')
-#     c=RequestContext(request,locals())
-#     return HttpResponse(t.render(c))
-
+# 获取服务器信息，列表展示
+def server_errors(request):
+    page_title='服务器错误信息'
+    errors = ErrorInfo.objects.all()
+    return render(request, 'servers/errors.html', locals())
