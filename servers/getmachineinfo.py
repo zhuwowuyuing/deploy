@@ -37,7 +37,7 @@ for (hostname, Info) in machineInfo.items():
 	os		        = Info.get('osfullname', '') + ' ' + Info.get('osrelease', '') + ' ' + Info.get('osarch', '') + ' '+ Info.get('kernelrelease', '')
 	manufacturer    = Info.get('manufacturer', '')
 	productname     = Info.get('productname', '')
-    	lines           = cursor.execute("select hostname from servers_baseinfo where hostname=%s", (hostname,))
+    lines           = cursor.execute("select hostname from servers_baseinfo where hostname=%s", (hostname,))
 
 	if lines == 0:
         	cursor.execute("INSERT into servers_baseinfo(hostname, status, cpu_model, num_cpus, mem_total, manufacturer, productname, os) \
@@ -46,7 +46,7 @@ for (hostname, Info) in machineInfo.items():
 	elif lines == 1 :
         	cursor.execute("update servers_baseinfo set status=%s, cpu_model=%s, num_cpus=%s, mem_total=%s, manufacturer=%s, productname=%s, os=%s where hostname=%s",(status, cpu_model, num_cpus, mem_total, manufacturer, productname, os,hostname))
 
-	conn.commit()
+conn.commit()
 
 for (hostname, diskusage) in diskInfo.items():
 #	print hostname
@@ -62,7 +62,8 @@ for (hostname, diskusage) in diskInfo.items():
 		total		= info.get('total', 0)
 
 		cursor.execute("INSERT into servers_diskinfo(hostname_id, mount, available, total) VALUES(%s,%s,%s,%s)", (hostname, mount, available, total))
-		conn.commit()
+
+conn.commit()
 
 for (hostname, interface) in networkInfo.items():
 	if not machineInfo.has_key(hostname):
@@ -78,7 +79,7 @@ for (hostname, interface) in networkInfo.items():
 		ipaddr =	((info['inet'])[0])['address']
 
 		cursor.execute("INSERT into servers_networkinfo(hostname_id, interface, hwaddr, ipaddr) VALUES(%s,%s,%s,%s)", (hostname,device, hwaddr, ipaddr))
-		conn.commit()
+        conn.commit()
 
 conn.commit()
 cursor.close()

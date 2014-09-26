@@ -1,0 +1,5 @@
+Ubuntu Env configure:
+sudo apt-get install python2.7 python2.7-dev python-pip mysql-client libmysqlclient-dev
+sudo pip install django==1.6.2
+sudo pip install south
+sudo pip install MySQL-python

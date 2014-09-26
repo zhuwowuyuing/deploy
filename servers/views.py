@@ -13,28 +13,7 @@ from forms import SearchMachineForm
 def index(request):
     return render(request,'index.html')
 
-
-# # 获取服务器信息
-# # tmp是存储服务器信息的字典，并将当前值加入到info列表
-# def get_machine_info(queryset):
-#     machine_list = []
-#     for machine in queryset:
-#         tmp                        = {}
-#         tmp['hostname']            = machine.hostname
-#         tmp['status']              = machine.status
-#         tmp['cpu_model']           = machine.cpu_model
-#         tmp['num_cpus']            = machine.num_cpus
-#         tmp['mem_total']           = machine.mem_total
-#         tmp['os']                  = machine.os
-#         tmp['productname']         = machine.productname
-#         tmp['manufacturer']        = machine.manufacturer
-#         tmp['disks']               = machine.disks.all().order_by('mount')
-#         tmp['interfaces']          = machine.interfaces.all().order_by('interface')
-#         machine_list.append(tmp)
-#
-#     return machine_list
-
-# 获取服务器信息，并汇总展示
+# 获取服务器信息，汇总展示
 def names(request):
     page_title='服务器汇总信息'
     machine_list = BaseInfo.objects.all()
@@ -69,7 +48,7 @@ def server_list(request):
 
             # 如果mem_total 和 num_cpus 有值，再次进行过滤
             if mem_total:
-                machine_list = machine_list.filter(mem_total=mem_total)
+                machine_list = machine_list.filter(mem_total__range=((mem_total-1)*1024, (mem_total+1)*1024))
 
             if num_cpus:
                 machine_list = machine_list.filter(num_cpus=num_cpus)
