@@ -5,7 +5,12 @@ import MySQLdb
 import types
 
 # connect database
-conn=MySQLdb.connect(host="192.168.1.92", port=3316, user="deploy",passwd="deploy",db="deploy")
+host="192.168.1.92"
+port=3316
+user="deploy"
+passwd="deploy"
+db="deploy"
+conn=MySQLdb.connect(host=host, port=port, user=user, passwd=passwd, db=db)
 cursor = conn.cursor()
 
 #drop diskinfo networkinfo errorinfo and reset auto_increment value
