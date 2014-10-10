@@ -65,8 +65,8 @@ DATABASES = {
         'NAME': 'deploy',
         'USER': 'deploy',
         'PASSWORD': 'deploy',
-        'HOST': '192.168.1.92',
-        'PORT': '3316',
+        'HOST': '192.168.1.31',
+        'PORT': '3759',
     }
 }
 
