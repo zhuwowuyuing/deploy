@@ -48,7 +48,7 @@ def server_list(request):
 
             # 如果mem_total 和 num_cpus 有值，再次进行过滤
             if mem_total:
-                machine_list = machine_list.filter(mem_total=mem_total)
+                machine_list = machine_list.filter(mem_total__range=((mem_total-1)*1024, (mem_total+1)*1024))
 
             if num_cpus:
                 machine_list = machine_list.filter(num_cpus=num_cpus)
