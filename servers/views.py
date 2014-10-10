@@ -9,6 +9,10 @@ from django.db.models.query import QuerySet
 from models import BaseInfo, DiskInfo, NetworkInfo, ErrorInfo
 from forms import SearchMachineForm
 
+import salt.config
+import salt.key
+import salt.client
+
 
 def index(request):
     return render(request,'index.html')
@@ -75,7 +79,9 @@ def server_list(request):
 # 服务器详细信息
 def server_view(request, hostname):
     page_title='服务器详情'
-    machine_instance = BaseInfo.objects.get(hostname=hostname)
+    machine_list = BaseInfo.objects.filter(hostname=hostname)
+    machine_instance =  machine_list[0] if machine_list else ''
+
     return render(request, 'servers/view.html', locals())
 
 # 获取服务器信息，列表展示
@@ -83,3 +89,35 @@ def server_errors(request):
     page_title='服务器错误信息'
     errors = ErrorInfo.objects.all()
     return render(request, 'servers/errors.html', locals())
+
+# 获取offline 列表
+def salt_status():
+    __opts__ = salt.config.master_config('/etc/salt/master')
+    client = salt.client.LocalClient(__opts__['conf_file'])
+    minions = client.cmd('*', 'test.ping', timeout=__opts__['timeout'])
+    key = salt.key.Key(__opts__)
+    keys = key.list_keys()
+    ret = {}
+    ret['up'] = sorted(minions)
+    ret['down'] = sorted(set(keys['minions']) - set(minions))
+    return ret['down']
+
+#暂时offline服务器
+def server_offline(request):
+    page_title='离线服务器列表'
+    offline_list = salt_status()
+
+    #分页
+    count = len(offline_list)
+    paginator = Paginator(offline_list ,15)
+
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        offline_list = paginator.page(page)
+    except :
+        offline_list = paginator.page(paginator.num_pages)
+    return render(request, 'servers/offline.html', locals())

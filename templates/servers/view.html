@@ -13,6 +13,7 @@
 
         <div id="server_view" class="tab-content">
             <div class="tab-pane active in" id="home">
+                {% if machine_instance %}
                 {% load measure %}
                 <table class="table table-bordered ">
                     <tr><td><strong>主机名：</strong></td></td><td>{{ machine_instance.hostname }}</td></tr>
@@ -31,6 +32,11 @@
                         <tr><td><strong>{{ network.interface }} MAC地址：</strong></td><td>{{ network.hwaddr }}</td></tr>
                     {% endfor %}
                 </table>
+            {% else %}
+                    <div align="center">
+                            <strong>没有该服务器信息</strong>
+                        </div>
+            {% endif %}
             </div>
 
             <div class="tab-pane fade" id="man_info">
