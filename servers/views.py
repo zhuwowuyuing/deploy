@@ -6,9 +6,10 @@ __author__ = 'liangnaihua'
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.db.models.query import QuerySet
-from models import BaseInfo, DiskInfo, NetworkInfo, ErrorInfo
+from models import BaseInfo, DiskInfo, NetworkInfo, ErrorInfo, CheckError
 from forms import SearchMachineForm
-
+from tables import *
+from django_tables2 import RequestConfig
 import salt.config
 import salt.key
 import salt.client
@@ -102,7 +103,7 @@ def salt_status():
     ret['down'] = sorted(set(keys['minions']) - set(minions))
     return ret['down']
 
-#暂时offline服务器
+# 暂时offline服务器
 def server_offline(request):
     page_title='离线服务器列表'
     offline_list = salt_status()
@@ -121,3 +122,11 @@ def server_offline(request):
     except :
         offline_list = paginator.page(paginator.num_pages)
     return render(request, 'servers/offline.html', locals())
+
+# offline服务器重启minions信息
+def server_checkerror(request):
+    page_title='重启Salt minions错误信息'
+    error_list = CheckError.objects.all().order_by('time')
+    error_table = CheckErrorTable(error_list)
+    RequestConfig(request).configure(error_table)
+    return render(request,'servers/checkerror.html', locals())

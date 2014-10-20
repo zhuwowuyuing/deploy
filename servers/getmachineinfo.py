@@ -5,8 +5,8 @@ import MySQLdb
 import types
 
 # connect database
-host="192.168.1.92"
-port=3316
+host="192.168.1.31"
+port=3759
 user="deploy"
 passwd="deploy"
 db="deploy"
@@ -44,11 +44,11 @@ for (hostname, Info) in machineInfo.items():
     lines           = cursor.execute("select hostname from servers_baseinfo where hostname=%s", (hostname,))
 
 	if lines == 0:
-        	cursor.execute("INSERT into servers_baseinfo(hostname, status, cpu_model, num_cpus, mem_total, manufacturer, productname, os) \
+        cursor.execute("INSERT into servers_baseinfo(hostname, status, cpu_model, num_cpus, mem_total, manufacturer, productname, os) \
                        VALUES(%s, %s, %s,%s, %s, %s, %s, %s)",\
                        (hostname, status, cpu_model, num_cpus, mem_total, manufacturer, productname, os))
 	elif lines == 1 :
-        	cursor.execute("update servers_baseinfo set status=%s, cpu_model=%s, num_cpus=%s, mem_total=%s, manufacturer=%s, productname=%s, os=%s where hostname=%s",(status, cpu_model, num_cpus, mem_total, manufacturer, productname, os,hostname))
+        cursor.execute("update servers_baseinfo set status=%s, cpu_model=%s, num_cpus=%s, mem_total=%s, manufacturer=%s, productname=%s, os=%s where hostname=%s",(status, cpu_model, num_cpus, mem_total, manufacturer, productname, os,hostname))
 
 conn.commit()
 
@@ -56,17 +56,17 @@ conn.commit()
 for (hostname, diskusage) in diskInfo.items():
 #	print hostname
 	if not machineInfo.has_key(hostname):
-		cursor.execute("INSERT INTO servers_errorinfo(hostname, info) VALUE(%s, %s)", (hostname, "Can get disks info,but baseinfo no this Machine"))
-		continue
-	if type(diskusage) is not types.DictType:
-		cursor.execute("INSERT INTO servers_errorinfo(hostname, info) VALUE(%s, %s)", (hostname, "Can not get disk data"))
-		continue
+        cursor.execute("INSERT INTO servers_errorinfo(hostname, info) VALUE(%s, %s)", (hostname, "Can get disks info,but baseinfo no this Machine"))
+        continue
+    if type(diskusage) is not types.DictType:
+        cursor.execute("INSERT INTO servers_errorinfo(hostname, info) VALUE(%s, %s)", (hostname, "Can not get disk data"))
+        continue
 
-	for (mount, info) in diskusage.items():
-		available	= info.get('available', 0)
-		total		= info.get('total', 0)
+    for (mount, info) in diskusage.items():
+        available	= info.get('available', 0)
+        total		= info.get('total', 0)
 
-		cursor.execute("INSERT into servers_diskinfo(hostname_id, mount, available, total) VALUES(%s,%s,%s,%s)", (hostname, mount, available, total))
+        cursor.execute("INSERT into servers_diskinfo(hostname_id, mount, available, total) VALUES(%s,%s,%s,%s)", (hostname, mount, available, total))
 
 conn.commit()
 
@@ -78,14 +78,14 @@ for (hostname, interface) in networkInfo.items():
 		continue
 	if type(interface) is not types.DictType:
 		cursor.execute("INSERT INTO servers_errorinfo(hostname, info) VALUE(%s, %s)", (hostname, "Can not get network interface data"))
-                continue
+        continue
 	for (device, info) in interface.items():
 		if not info.has_key('inet') or not cmp(device, 'lo'):
 			continue
 		hwaddr =	info.get('hwaddr', '')
 		ipaddr =	((info['inet'])[0])['address']
 
-		cursor.execute("INSERT into servers_networkinfo(hostname_id, interface, hwaddr, ipaddr) VALUES(%s,%s,%s,%s)", (hostname,device, hwaddr, ipaddr))
+        cursor.execute("INSERT into servers_networkinfo(hostname_id, interface, hwaddr, ipaddr) VALUES(%s,%s,%s,%s)", (hostname,device, hwaddr, ipaddr))
         conn.commit()
 
 conn.commit()

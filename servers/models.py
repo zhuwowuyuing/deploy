@@ -59,3 +59,14 @@ class ErrorInfo(models.Model):
 
     def __unicode__(self):
         return u'%s' % (self.hostname)
+
+class CheckError(models.Model):
+    class Meta:
+        verbose_name = '检测脚本错误信息'
+        verbose_name_plural = verbose_name
+    time                = models.DateTimeField("故障时间")
+    hostname            = models.CharField('主机名',max_length=60)
+    errormsg            = models.CharField('错误信息', max_length=1000)
+
+    def __unicode__(self):
+        return u'%s' % (self.hostname)
