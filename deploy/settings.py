@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'servers',
     'common',
     'servers.templatetags',
+    'assets',
 )
 
 MIDDLEWARE_CLASSES = (

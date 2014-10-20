@@ -1,0 +1,101 @@
+
+{% extends "base.html" %}
+
+{#{% block title %} Servers - Create {% endblock %}#}
+{##}
+{#{% block heading %}<h1>  Servers - Create </h1>  {% endblock %}#}
+
+{% block content %}
+    <div class="row-fluid">
+        <div class="block">
+            <p class="block-heading">新增资产记录</p>
+            <div class="block-body">
+                <form action="" method="POST"> {% csrf_token %}
+                    <table class="table">
+                        <tr>
+                            <td>{{ asset_form.asset.label}}</td><td>{{asset_form.asset}}</td>
+                            <td>{{ asset_form.asset_old.label }}</td><td>{{asset_form.asset_old}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.district.label }}</td><td>{{asset_form.district}}</td>
+                            <td>{{ asset_form.company.label }}</td><td>{{asset_form.company}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.type.label }}</td><td>{{asset_form.type}}</td>
+                            <td>{{ asset_form.subtype.label }}</td><td>{{asset_form.subtype}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.status.label }}</td><td>{{asset_form.status}}</td>
+                            <td>{{ asset_form.manufacturer.label }}</td><td>{{asset_form.manufacturer}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.model.label }}</td><td>{{asset_form.model}}</td>
+                            <td>{{ asset_form.serialno.label }}</td><td>{{asset_form.serialno}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.size.label }}</td><td>{{asset_form.size}}</td>
+                            <td>{{ asset_form.cpu.label }}</td><td>{{asset_form.cpu}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.harddisk.label }}</td><td>{{ asset_form.harddisk }}</td>
+                            <td>{{ asset_form.ram.label }}</td><td>{{asset_form.ram}}</td>
+
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.os.label }}</td><td>{{asset_form.os}}</td>
+                            <td>{{ asset_form.building.label }}</td><td>{{asset_form.building}}</td>
+
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.location.label }}</td><td>{{asset_form.location}}</td>
+                            <td>{{ asset_form.consignee.label }}</td><td>{{asset_form.consignee}}</td>
+
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.hostname.label }}</td><td>{{asset_form.hostname}}</td>
+                            <td>{{ asset_form.dept.label }}</td><td>{{asset_form.dept}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.business.label }}</td><td>{{asset_form.business}}</td>
+                            <td>{{ asset_form.ownername.label }}</td><td>{{asset_form.ownername}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.administrator.label }}</td><td>{{asset_form.administrator}}</td>
+                            <td>{{ asset_form.warehousedate.label }}</td><td>{{asset_form.warehousedate}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.receivedate.label }}</td><td>{{asset_form.receivedate}}</td>
+                            <td>{{ asset_form.warrantyexpirationdate.label }}</td><td>{{asset_form.warrantyexpirationdate}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.scrapDate.label }}</td><td>{{asset_form.scrapDate}}</td>
+                            <td>{{ asset_form.purchase_date.label }}</td><td>{{asset_form.purchase_date}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.accounting_date.label }}</td><td>{{asset_form.accounting_date}}</td>
+                            <td>{{ asset_form.purchase_cost.label }}</td><td>{{asset_form.purchase_cost}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.account_cost.label }}</td><td>{{asset_form.account_cost}}</td>
+                            <td>{{ asset_form.vendor.label }}</td><td>{{asset_form.vendor}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.vendor_contacts.label }}</td><td>{{asset_form.vendor_contacts}}</td>
+                            <td>{{ asset_form.accounting_info.label }}</td><td>{{asset_form.accounting_info}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.order_list.label }}</td><td>{{asset_form.order_list}}</td>
+                            <td>{{ asset_form.changeInfo.label }}</td><td>{{asset_form.changeInfo}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ asset_form.comment.label }}</td><td>{{asset_form.comment}}</td>
+                            <td></td><td></td>
+                        </tr>
+                        <tr><td colspan="2" align="right"><input type="submit" value="添加" /></td></tr>
+                    </table>
+                </form>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
