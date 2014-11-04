@@ -13,6 +13,8 @@ from django_tables2 import RequestConfig
 import salt.config
 import salt.key
 import salt.client
+from assets.models import *
+from assets.forms import *
 
 
 def index(request):
@@ -80,8 +82,24 @@ def server_list(request):
 # 服务器详细信息
 def server_view(request, hostname):
     page_title='服务器详情'
-    machine_list = BaseInfo.objects.filter(hostname=hostname)
-    machine_instance =  machine_list[0] if machine_list else ''
+    # machine_list = BaseInfo.objects.filter(hostname=hostname)
+    # machine_instance =  machine_list[0] if machine_list else ''
+    machine_instance = BaseInfo.objects.get(hostname=hostname)
+
+    # asset info
+    server_instance = Server.objects.get(hostname=machine_instance.hostname)
+    device_instance = server_instance.asset
+    maninfo_instance = device_instance.maninfo
+    device_form = DeviceForm(None, instance = device_instance)
+    server_form = ServerForm(None, instance = server_instance)
+    maninfo_form = ManInfoForm(None, instance = maninfo_instance)
+
+    for field in device_form.fields.keys():
+        device_form.fields[field].widget.attrs['disabled'] = True
+    for field in server_form.fields.keys():
+        server_form.fields[field].widget.attrs['disabled'] = True
+    for field in maninfo_form.fields.keys():
+        maninfo_form.fields[field].widget.attrs['disabled'] = True
 
     return render(request, 'servers/view.html', locals())
 

@@ -11,6 +11,7 @@
         <ul class="nav nav-tabs">
             <li class="active"><a href="#home" data-toggle="tab">编辑服务器信息</a></li>
             <li><a href="#history" data-toggle="tab">修改历史</a></li>
+            <li><a href="#salt_info" data-toggle="tab">采集信息</a></li>
         </ul>
         <div id="myTabContent" class="tab-content">
 
@@ -149,6 +150,32 @@
                 {% else %}
                     <div align="center">
                         <strong>没有相关修改历史</strong>
+                    </div>
+                {% endif %}
+            </div>
+        <div class="tab-pane fade" id="salt_info">
+                {% if machine_instance %}
+                    {% load measure %}
+                    <table class="table table-bordered ">
+                        <tr><td><strong>主机名：</strong></td></td><td>{{ machine_instance.hostname }}</td></tr>
+                        <tr><td><strong>状态：</strong></td><td>{{ machine_instance.status }}</td></tr>
+                        <tr><td><strong>CPU型号：</strong></td><td>{{ machine_instance.cpu_model }}</td></tr>
+                        <tr><td><strong>CPU核数：</strong></td><td>{{ machine_instance.num_cpus }}</td></tr>
+                        <tr><td><strong>内存：</strong></td><td>{{ machine_instance.mem_total | memmeasure }}</td></tr>
+                        <tr><td><strong>操作系统：</strong></td><td>{{ machine_instance.os }}</td></tr>
+                        <tr><td><strong>型号：</strong></td><td>{{ machine_instance.productname }}</td></tr>
+                        <tr><td><strong>品牌：</strong></td><td>{{ machine_instance.manufacturer }}</td></tr>
+                        {% for disk in machine_instance.disks.all %}
+                            <tr><td><strong>磁盘{{ disk.mount }}:</strong></td><td>{{ disk.available | diskmeasure }}/{{ disk.total | diskmeasure}} </td></tr>
+                        {% endfor %}
+                        {% for network in machine_instance.interfaces.all %}
+                            <tr><td><strong>{{ network.interface }} IP地址：</strong></td><td>{{ network.ipaddr }}</td></tr>
+                            <tr><td><strong>{{ network.interface }} MAC地址：</strong></td><td>{{ network.hwaddr }}</td></tr>
+                        {% endfor %}
+                    </table>
+                {% else %}
+                    <div align="center">
+                        <strong>没有该服务器信息</strong>
                     </div>
                 {% endif %}
             </div>

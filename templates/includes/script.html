@@ -5,3 +5,22 @@
         $('.demo-cancel-click').click(function(){return false;});
     });
 </script>
+
+<script>
+    $(document).ready(function(){
+        $("i.btn-danger").click(function(){
+            var url = $('[urlink]').attr("urlink");
+            if(url && confirm("警告！！确认删除？"))
+            {//如果是true ，删除asset
+                location.href=url;
+            }
+        });
+        $("i#btn_cancel").click(function(){
+            var url = $("#cancel").attr("urlink");
+            if(url)
+            {//如果是true ，删除asset
+                location.href=url;
+            }
+        });
+    });
+</script>

@@ -9,11 +9,32 @@ class Status(models.Model):
         verbose_name = '使用状态'
         verbose_name_plural = verbose_name
 
-    status          = models.CharField('使用状态',max_length=60, primary_key=True)
+    status          = models.CharField('使用状态',max_length=60, unique=True)
     exclusive       = models.BooleanField('不可用', default=False)
 
     def __unicode__(self):
         return u'%s' % (self.status)
+
+class Type(models.Model):
+    class Meta:
+        verbose_name = '设备类别'
+        verbose_name_plural = verbose_name
+
+    name            = models.CharField('类别', max_length=60, unique=True)
+
+    def __unicode__(self):
+        return u'%s' % (self.name)
+
+class Subtype(models.Model):
+    class Meta:
+        verbose_name = '设备子类别'
+        verbose_name_plural = verbose_name
+
+    type            = models.ForeignKey(Type, verbose_name='类别')
+    name            = models.CharField('子类别', max_length=60, unique=True)
+
+    def __unicode__(self):
+        return u'%s' % (self.name)
 
 
 class Devices(models.Model):
@@ -26,9 +47,11 @@ class Devices(models.Model):
     asset_old       = models.CharField('旧资产编号', max_length=60, blank=True)
     district        = models.CharField('所在地区', max_length=60)
     company         = models.CharField('账上所属公司', max_length=60)
-    status          = models.ForeignKey(Status, verbose_name='使用状态')
-    type            = models.CharField('类别', max_length=60)
-    subtype         = models.CharField('子类别', max_length=60, blank=True)
+    status          = models.ForeignKey(Status, verbose_name='使用状态', db_column='status')
+    # type            = models.CharField('类别', max_length=60)
+    # subtype         = models.CharField('子类别', max_length=60, blank=True)
+    type            = models.ForeignKey(Type, verbose_name='类别', db_column='type')
+    subtype         = models.ForeignKey(Subtype, verbose_name='子类别', db_column='subtype')
     manufacturer    = models.CharField('品牌', max_length=60, blank=True)
     model           = models.CharField('型号', max_length=100, blank=True)
     serialno        = models.CharField('序列号', max_length=100, blank=True)
@@ -102,3 +125,4 @@ class ModLog(models.Model):
 
     def __unicode__(self):
         return u'%s %s %s %s %s' % (self.asset, self.mtime, self.field, self.oldvalue, self.newvalue)
+

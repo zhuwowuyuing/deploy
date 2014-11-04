@@ -3,7 +3,7 @@ __author__ = 'liangnaihua'
 
 from django import forms
 from django.forms import ModelChoiceField
-from models import Devices, Status, Server, ManInfo, ModLog
+from models import Devices, Status, Server, ManInfo, ModLog, Type, Subtype
 import datetime
 from django.contrib.admin.widgets import AdminDateWidget
 
@@ -12,11 +12,13 @@ from django.contrib.admin.widgets import AdminDateWidget
 class AssetSearch(forms.Form):
     asset           = forms.CharField(label='资产编号', max_length=60, required=False)
     asset_old       = forms.CharField(label='旧资产编号', max_length=60, required=False)
-    type            = forms.CharField(label='类别', max_length=60, required=False)
-    subtype         = forms.CharField(label='子类别', max_length=60, required=False)
+    # type            = forms.CharField(label='类别', max_length=60, required=False)
+    # subtype         = forms.CharField(label='子类别', max_length=60, required=False)
+    type            = forms.ModelChoiceField(label='类别', queryset=Type.objects.all(), required=False)
+    subtype         = forms.ModelChoiceField(label='子类别', queryset=Subtype.objects.all(), required=False)
     manufacturer    = forms.CharField(label='品牌', max_length=60, required=False)
     model           = forms.CharField(label='型号', max_length=100, required=False)
-    status		    = ModelChoiceField(label='使用状态', queryset=Status.objects.filter(exclusive=False), required=False)
+    status		    = forms.ModelChoiceField(label='使用状态', queryset=Status.objects.filter(exclusive=False), required=False)
     building        = forms.CharField(label='机房(所处位置)',max_length=60, required=False)
     location        = forms.CharField(label='机柜',max_length=60, required=False)
     consignee       = forms.CharField(label='托管编号',max_length=60, required=False)
@@ -71,6 +73,22 @@ class StatusForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(StatusForm, self).__init__(*args, **kwargs)
 
+class TypeForm(forms.ModelForm):
+    class Meta:
+        model = Type
+    # exclude = [] # uncomment this line and specify any field to exclude it from the form
+
+    def __init__(self, *args, **kwargs):
+        super(TypeForm, self).__init__(*args, **kwargs)
+
+class SubtypeForm(forms.ModelForm):
+    class Meta:
+        model = Subtype
+    # exclude = [] # uncomment this line and specify any field to exclude it from the form
+
+    def __init__(self, *args, **kwargs):
+        super(SubtypeForm, self).__init__(*args, **kwargs)
+
 class DeviceForm(forms.ModelForm):
     class Meta:
         model = Devices
@@ -79,12 +97,6 @@ class DeviceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(DeviceForm, self).__init__(*args, **kwargs)
         self.fields['status'].queryset = Status.objects.filter(exclusive=False)
-
-    # def clean_asset(self):
-    #     asset = self.cleaned_data['asset']
-    #     if Devices.objects.filter(asset=asset):
-    #        raise forms.ValidationError("资产编号重复")
-    #     return asset
 
 
 class ServerForm(forms.ModelForm):

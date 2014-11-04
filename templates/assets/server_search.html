@@ -85,12 +85,8 @@
                             <td>  {{item.server.hostname}}</td>
                             <td>  {{item.maninfo.vendor}}</td>
                             <td><a href="{% url "assets.views.server_view" item.asset %}">Show</a> </td>
-{#                            <td><a href="{% url "assets.views.server_edit" item.asset %}">Edit</a></td>#}
-{#                            <td><a href="{% url "assets.views.server_delete" item.asset %}" role="button">Delete</a></td>#}
                             <td><a href="{% url "assets.views.server_edit" item.asset %}"><i class="icon-pencil"></i></a></td>
-                            <td><a href="{% url "assets.views.server_delete" item.asset %}" role="button" onclick="del_firm()"><i class="icon-remove"></i></a></td>
-{#                            <td><a href="#myModal" role="button"  data-toggle="modal"><i class="icon-remove"></i></a></td>#}
-
+                            <td><a id='server_del' href="#" role="button" urlink="{% url "assets.views.server_delete" item.asset %}" asset="{{ item.asset }}"><i class="icon-remove"></i></a></td>
                         </tr>
                     {% endfor %}
                     <tr>
@@ -98,20 +94,6 @@
                         <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
                     </tr>
                 </table>
-
-{#                <div class="modal small hide fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">#}
-{#                    <div class="modal-header">#}
-{#                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>#}
-{#                        <h3 id="myModalLabel">Delete Confirmation</h3>#}
-{#                    </div>#}
-{#                    <div class="modal-body">#}
-{#                        <p class="error-text"><i class="icon-warning-sign modal-icon"></i>Are you sure you want to delete the user?</p>#}
-{#                    </div>#}
-{#                    <div class="modal-footer">#}
-{#                        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>#}
-{#                        <button class="btn btn-danger" data-dismiss="modal">Delete</button>#}
-{#                    </div>#}
-{#                </div>#}
 
                 <div align="center">
                     {% if list_items.has_previous %}
@@ -130,17 +112,17 @@
             </div>
         </div>
     </div>
+
     <script>
-    function del_firm()
-{//利用对话框返回的值 （true 或者 false）
-    if(confirm("你确信要转去 天轰穿的博客？"))
-    {//如果是true ，那么就把页面转向thcjp.cnblogs.com
-        location.href="http://thcjp.cnblogs.com";
-    }
-    else
-    {//否则说明下了，赫赫
-        alert("你按了取消，那就是返回false");
-    }
-}
+        $(document).ready(function(){
+            $("#server_del").click(function(){
+                var url = $('#server_del').attr("urlink");
+                var asset = $('#server_del').attr("asset")
+                if(confirm("警告！！确认删除资产"+asset+"？"))
+                {//如果是true ，删除asset
+                    location.href=url;
+                }
+            });
+        });
     </script>
 {% endblock %}
