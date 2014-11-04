@@ -85,8 +85,8 @@
                             <td>  {{item.server.hostname}}</td>
                             <td>  {{item.maninfo.vendor}}</td>
                             <td><a href="{% url "assets.views.server_view" item.asset %}">Show</a> </td>
-                            <td><a href="{% url "assets.views.server_edit" item.asset %}">Edit</a></td>
-                            <td><a href="{% url "assets.views.server_delete" item.asset %}">Delete</a></td>
+                            <td><a href="{% url "assets.views.server_edit" item.asset %}"><i class="icon-pencil"></i></a></td>
+                            <td><a id='server_del' href="#" role="button" urlink="{% url "assets.views.server_delete" item.asset %}" asset="{{ item.asset }}"><i class="icon-remove"></i></a></td>
                         </tr>
                     {% endfor %}
                     <tr>
@@ -112,4 +112,17 @@
             </div>
         </div>
     </div>
+
+    <script>
+        $(document).ready(function(){
+            $("#server_del").click(function(){
+                var url = $('#server_del').attr("urlink");
+                var asset = $('#server_del').attr("asset")
+                if(confirm("警告！！确认删除资产"+asset+"？"))
+                {//如果是true ，删除asset
+                    location.href=url;
+                }
+            });
+        });
+    </script>
 {% endblock %}

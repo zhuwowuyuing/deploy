@@ -3,7 +3,7 @@ __author__ = 'liangnaihua'
 
 from django import forms
 from django.forms import ModelChoiceField
-from models import Devices, Status, Server, ManInfo, ModLog
+from models import Devices, Status, Server, ManInfo, ModLog, Type, Subtype
 import datetime
 from django.contrib.admin.widgets import AdminDateWidget
 
@@ -12,11 +12,11 @@ from django.contrib.admin.widgets import AdminDateWidget
 class AssetSearch(forms.Form):
     asset           = forms.CharField(label='资产编号', max_length=60, required=False)
     asset_old       = forms.CharField(label='旧资产编号', max_length=60, required=False)
-    type            = forms.CharField(label='类别', max_length=60, required=False)
-    subtype         = forms.CharField(label='子类别', max_length=60, required=False)
+    type            = forms.ModelChoiceField(label='类别', queryset=Type.objects.all(), required=False)
+    subtype         = forms.ModelChoiceField(label='子类别', queryset=Subtype.objects.all(), required=False)
     manufacturer    = forms.CharField(label='品牌', max_length=60, required=False)
     model           = forms.CharField(label='型号', max_length=100, required=False)
-    status		    = ModelChoiceField(label='使用状态', queryset=Status.objects.filter(exclusive=False), required=False)
+    status		    = forms.ModelChoiceField(label='使用状态', queryset=Status.objects.filter(exclusive=False), required=False)
     building        = forms.CharField(label='机房(所处位置)',max_length=60, required=False)
     location        = forms.CharField(label='机柜',max_length=60, required=False)
     consignee       = forms.CharField(label='托管编号',max_length=60, required=False)
@@ -71,13 +71,21 @@ class StatusForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(StatusForm, self).__init__(*args, **kwargs)
 
-# class DeviceForm(forms.ModelForm):
-# 	class Meta:
-# 		model = Devices
-# 		# exclude = [] # uncomment this line and specify any field to exclude it from the form
-#
-# 	def __init__(self, *args, **kwargs):
-#         super(DeviceForm, self).__init__(*args, **kwargs)
+class TypeForm(forms.ModelForm):
+    class Meta:
+        model = Type
+    # exclude = [] # uncomment this line and specify any field to exclude it from the form
+
+    def __init__(self, *args, **kwargs):
+        super(TypeForm, self).__init__(*args, **kwargs)
+
+class SubtypeForm(forms.ModelForm):
+    class Meta:
+        model = Subtype
+    # exclude = [] # uncomment this line and specify any field to exclude it from the form
+
+    def __init__(self, *args, **kwargs):
+        super(SubtypeForm, self).__init__(*args, **kwargs)
 
 class DeviceForm(forms.ModelForm):
     class Meta:
@@ -88,8 +96,6 @@ class DeviceForm(forms.ModelForm):
         super(DeviceForm, self).__init__(*args, **kwargs)
         self.fields['status'].queryset = Status.objects.filter(exclusive=False)
 
-
-
 class ServerForm(forms.ModelForm):
     class Meta:
         model = Server
@@ -98,7 +104,6 @@ class ServerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ServerForm, self).__init__(*args, **kwargs)
 
-
 class ManInfoForm(forms.ModelForm):
     class Meta:
         model = ManInfo
@@ -106,18 +111,21 @@ class ManInfoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ManInfoForm, self).__init__(*args, **kwargs)
-        self.fields['warehousedate'].widget     = AdminDateWidget
         self.fields['warehousedate'].initial    = datetime.date.today
-        self.fields['receivedate'].widget   = AdminDateWidget
         self.fields['receivedate'].initial  = datetime.date.today
-        self.fields['warrantyexpirationdate'].widget    = AdminDateWidget
         self.fields['warrantyexpirationdate'].initial   = datetime.date(datetime.date.today().year+3,datetime.date.today().month, \
                                                                           datetime.date.today().day)
-        self.fields['scrapDate'].widget     = AdminDateWidget
-        self.fields['purchase_date'].widget = AdminDateWidget
         self.fields['purchase_date'].initial = datetime.date.today
         self.fields['purchase_cost'].initial = 0
-        self.fields['accounting_date'].widget   = AdminDateWidget
         self.fields['accounting_date'].initial  = datetime.date.today
         self.fields['account_cost'].initial = 0
 
+
+class ModLogSearchForm(forms.Form):
+    typename        =forms.CharField(label="类型", max_length=60, required=False)
+    asset           =forms.CharField(label='资产编号', max_length=60, required=False)
+    moduser         =forms.CharField(label='修改人', max_length=60, required=False)
+    field           =forms.CharField(label='字段名称',max_length=60, required=False)
+    comment         =forms.CharField(label='备注',max_length=500, required=False)
+    starttime       =forms.DateTimeField(label="修改时间从", required=False)
+    endtime         =forms.DateTimeField(label="修改时间至", required=False)

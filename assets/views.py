@@ -1,11 +1,15 @@
 #coding=utf8
 import copy
+import types
 import datetime
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from models import Devices, Server, Status, ManInfo
 from forms import *
 from django.http import HttpResponse, HttpResponseRedirect
+from tables import *
+from django_tables2 import RequestConfig
+from servers.models import *
 # from forms import AssetSearch, AssetForm
 # Create your views here.
 
@@ -23,31 +27,90 @@ def status_create(request):
 def status_list(request):
     page_title='使用状态列表'
     list_items = Status.objects.all()
-    paginator = Paginator(list_items ,15)
-
-
-    try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
-
-    try:
-        list_items = paginator.page(page)
-    except :
-        list_items = paginator.page(paginator.num_pages)
-
+    list_items = StatusTable(list_items)
+    RequestConfig(request).configure(list_items)
     return render(request, 'assets/status_list.html', locals())
 
 # 编辑使用状态
-def status_edit(request, status):
+def status_edit(request, id):
     page_title='编辑使用状态'
-    status_instance = Status.objects.get(status = status)
+    status_instance = Status.objects.get(id = id)
 
     form = StatusForm(request.POST or None, instance = status_instance)
 
     if form.is_valid():
         form.save()
     return render(request, 'assets/status_edit.html', locals())
+
+def status_del(request, id):
+    Status.objects.get(id = id).delete()
+    return HttpResponseRedirect("/assets/status/list/", locals())
+
+# 新建状态记录
+def type_create(request):
+    page_title='添加设备类别'
+    form = TypeForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        form = TypeForm()
+
+    return render(request, 'assets/type_create.html', locals())
+
+# 状态列表
+def type_list(request):
+    page_title='设备类别列表'
+    list_items = Type.objects.all()
+    list_items = TypeTable(list_items)
+    RequestConfig(request).configure(list_items)
+    return render(request, 'assets/type_list.html', locals())
+
+
+# 编辑使用状态
+def type_edit(request, id):
+    page_title='编辑设备类别'
+    instance = Type.objects.get(id = id)
+    form = TypeForm(request.POST or None, instance = instance)
+    if form.is_valid():
+        form.save()
+    return render(request, 'assets/type_edit.html', locals())
+
+def type_del(request, id):
+    Type.objects.get(id = id).delete()
+    return HttpResponseRedirect("/assets/type/list/", locals())
+
+
+# 新建状态记录
+def subtype_create(request):
+    page_title='添加设备子类别'
+    form = SubtypeForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        form = SubtypeForm()
+    return render(request, 'assets/type_create.html', locals())
+
+# 状态列表
+def subtype_list(request):
+    page_title='设备子类别列表'
+    list_items = Subtype.objects.all()
+    list_items = SubtypeTable(list_items)
+    RequestConfig(request).configure(list_items)
+    return render(request, 'assets/type_list.html', locals())
+
+
+# 编辑使用状态
+def subtype_edit(request, id):
+    page_title='编辑设备子类别'
+    instance = Subtype.objects.get(id = id)
+
+    form = SubtypeForm(request.POST or None, instance = instance)
+
+    if form.is_valid():
+        form.save()
+    return render(request, 'assets/subtype_edit.html', locals())
+
+def subtype_del(request, id):
+    Subtype.objects.get(id = id).delete()
+    return HttpResponseRedirect("/assets/subtype/list/", locals())
 
 def server_list(request):
     page_title='资产信息列表'
@@ -69,9 +132,6 @@ def server_list(request):
 
 def server_create(request):
     page_title='新增资产记录'
-    prefix_device   = 'device_form'
-    prefix_server   = 'server_form'
-    prefix_maninfo  = 'maninfo_form'
 
     if request.method == "POST":
         device_form     = DeviceForm(request.POST)
@@ -87,79 +147,21 @@ def server_create(request):
             maninfo.asset = device
             maninfo.save()
     else:
-        device_form     = DeviceForm(prefix=prefix_device)
-        server_form     = ServerForm(prefix=prefix_server)
-        maninfo_form    = ManInfoForm(prefix=prefix_maninfo)
+        device_form     = DeviceForm()
+        server_form     = ServerForm()
+        maninfo_form    = ManInfoForm()
 
     return render(request, 'assets/server_create.html', locals())
-#
-# def server_create(request):
-#     page_title='新增资产记录'
-#     if request.method == "POST":
-#         asset_form = AssetForm(request.POST)
-#         if asset_form.is_valid():
-#             data = asset_form.cleaned_data
-#             asset = data.get('asset','')
-#             asset_old = data.get('asset_old','')
-#             district = data.get('district','')
-#             company = data.get('company','')
-#             type = data.get('type','')
-#             subtype = data.get('subtype','')
-#             status = '' if data.get('status','') == None else data.get('status')
-#             manufacturer = data.get('manufacturer','')
-#             model = data.get('model','')
-#             serialno = data.get('serialno','')
-#             size = data.get('size', '')
-#             cpu = data.get('cpu', '')
-#             harddisk = data.get('harddisk','')
-#             ram = data.get('ram','')
-#             os = data.get('os','')
-#             building = data.get('building','')
-#             location = data.get('location','')
-#             consignee = data.get('consignee','')
-#             hostname = data.get('hostname','')
-#             dept = data.get('dept','')
-#             business = data.get('business','')
-#             ownername = data.get('ownername','')
-#             administrator = data.get('administrator','')
-#             warehousedate = data.get('warehousedate','')
-#             receivedate = data.get('receivedate','')
-#             warrantyexpirationdate = data.get('warrantyexpirationdate','')
-#             scrapDate = data.get('scrapDate','')
-#             purchase_date = data.get('purchase_date','')
-#             purchase_cost = 0 if not  data.get('purchase_cost','')  else float(data.get('purchase_cost'))
-#             accounting_date = data.get('accounting_date','')
-#             account_cost = 0 if not data.get('account_cost','')  else float(data.get('account_cost'))
-#             vendor = data.get('vendor','')
-#             vendor_contacts = data.get('vendor_contacts','')
-#             accounting_info = data.get('accounting_info','')
-#             order_list = data.get('order_list','')
-#             changeInfo = data.get('changeInfo','')
-#             comment = data.get('comment','')
-#
-#             if not changeInfo:
-#                 changeInfo = "%s 新增资产信息"%(datetime.date.today()).strftime('%Y-%m-%d')
-#
-#             new_device = Devices(asset=asset, asset_old=asset_old, district=district, company=company,status=status, \
-#                                  type=type, subtype=subtype, manufacturer=manufacturer, model=model, serialno=serialno, \
-#                                  changeInfo=changeInfo, comment=comment)
-#             new_device.save()
-#
-#             new_server = Server(asset=new_device, size=size, cpu=cpu, harddisk=harddisk, ram=ram, os=os, building=building, \
-#                                 location=location, consignee=consignee, hostname=hostname, dept=dept, business=business, \
-#                                 ownername=ownername)
-#             new_server.save()
-#
-#             new_maninfo = ManInfo(asset=new_device, administrator=administrator, warehousedate=warehousedate, receivedate=receivedate, \
-#                                   warrantyexpirationdate=warrantyexpirationdate, scrapDate=scrapDate, purchase_date=purchase_date, \
-#                                   purchase_cost=purchase_cost, accounting_date=accounting_date, account_cost=account_cost, \
-#                                   vendor=vendor, vendor_contacts=vendor_contacts, accounting_info=accounting_info, \
-#                                   order_list=order_list)
-#             new_maninfo.save()
-#     else:
-#         asset_form = AssetForm()
-#     return render(request, 'assets/server_create.html', locals())
 
+def modinfo(type, asset, field_list, old_obj, new_obj, username):
+    for field in field_list:
+        log = ModLog(typename = type,asset=asset,     \
+                     mtime = datetime.datetime.now(), \
+                     field = old_obj._meta.get_field(field).verbose_name, \
+                     oldvalue = getattr(old_obj, field), \
+                     newvalue = getattr(new_obj, field), \
+                     moduser = username)
+        log.save()
 
 # 编辑 assets
 def server_edit(request, asset):
@@ -172,42 +174,21 @@ def server_edit(request, asset):
     old_server_instance = copy.deepcopy(server_instance)
     old_maninfo_instance = copy.deepcopy(maninfo_instance)
     list_log = ModLog.objects.filter(asset = asset, typename="服务器").order_by('-mtime')
-    prefix_device   = "device_form"
-    prefix_server   = "server_form"
-    prefix_maninfo   = "maninfo_form"
 
     device_form     = DeviceForm(request.POST or None, instance = device_instance)
     server_form     = ServerForm(request.POST or None, instance = server_instance)
     maninfo_form    = ManInfoForm(request.POST or None, instance = maninfo_instance)
-
-    # device_form     = DeviceForm(request.POST or None, instance = device_instance, prefix=prefix_device)
-    # server_form     = ServerForm(request.POST or None, instance = server_instance, prefix=prefix_server)
-    # maninfo_form    = ManInfoForm(request.POST or None, instance = maninfo_instance, prefix=prefix_maninfo)
+    device_change_fields    = []
+    server_change_fields    = []
+    maninfo_change_fields   = []
 
     if device_form.is_valid() and server_form.is_valid() and maninfo_form.is_valid():
         if device_form.has_changed():
-            for filed in device_form.changed_data:
-                log = ModLog(typename="服务器",asset=device_instance.asset, mtime= datetime.datetime.now(),\
-                             field=device_instance._meta.get_field(filed).verbose_name,\
-                             oldvalue=old_device_instance.__dict__[filed], newvalue=device_form.data.get('%s-%s'%(prefix_device, filed),''), \
-                             moduser=request.user)
-                log.save()
-
+            device_change_fields = device_form.changed_data
         if server_form.has_changed():
-            for filed in server_form.changed_data:
-                log = ModLog(typename="服务器",asset=server_instance.asset, mtime= datetime.datetime.now(),\
-                             field=server_instance._meta.get_field(filed).verbose_name,\
-                             oldvalue=old_server_instance.__dict__[filed], newvalue=server_form.data.get('%s-%s'%(prefix_server, filed),''), \
-                             moduser=request.user)
-                log.save()
-
+            server_change_fields = server_form.changed_data
         if maninfo_form.has_changed():
-            for filed in maninfo_form.changed_data:
-                log = ModLog(typename="服务器",asset=maninfo_instance.asset, mtime= datetime.datetime.now(),
-                             field=maninfo_instance._meta.get_field(filed).verbose_name,
-                             oldvalue=old_maninfo_instance.__dict__[filed], newvalue=maninfo_form.data.get('%s-%s'%(prefix_maninfo, filed),''), \
-                             moduser=request.user)
-                log.save()
+            maninfo_change_fields = maninfo_form.changed_data
 
         device = device_form.save()
         server = server_form.save(commit=False)
@@ -229,6 +210,18 @@ def server_view(request, asset):
     device_form = DeviceForm(None, instance = device_instance)
     server_form = ServerForm(None, instance = server_instance)
     maninfo_form = ManInfoForm(None, instance = maninfo_instance)
+
+    for field in device_form.fields.keys():
+            device_form.fields[field].widget.attrs['readonly'] = True
+    device_form.fields['status'].widget.attrs['disabled'] = True
+    for field in server_form.fields.keys():
+            server_form.fields[field].widget.attrs['readonly'] = True
+    for field in maninfo_form.fields.keys():
+            maninfo_form.fields[field].widget.attrs['readonly'] = True
+    if server_instance.hostname:
+        machine_instance = BaseInfo.objects.get(hostname=server_instance.hostname)
+    else:
+        machine_instance = None
 
     list_log = ModLog.objects.filter(asset = asset, typename=typename).order_by('-mtime')
     return render(request, 'assets/server_view.html', locals())
@@ -252,8 +245,8 @@ def server_search(request):
             data = searchform.cleaned_data
             asset = data.get('asset','')
             asset_old = data.get('asset_old','')
-            type = data.get('type','')
-            subtype = data.get('subtype','')
+            type = '' if data.get('type','') == None else data.get('type')
+            subtype = '' if data.get('subtype','') == None else data.get('subtype')
             manufacturer = data.get('manufacturer','')
             model = data.get('model','')
             building = data.get('building','')
@@ -264,8 +257,8 @@ def server_search(request):
             status = '' if data.get('status','') == None else data.get('status')
             list_items = Devices.objects.filter(asset__icontains = asset,
                                                 asset_old__icontains = asset_old,
-                                                type__icontains = type,
-                                                subtype__icontains = subtype,
+                                                type__name__icontains = type,
+                                                subtype__name__icontains = subtype,
                                                 manufacturer__icontains = manufacturer,
                                                 model__icontains = model,
                                                 server__building__icontains = building,
@@ -290,3 +283,56 @@ def server_search(request):
         searchform = AssetSearch()
 
     return render(request, "assets/server_search.html", locals())
+
+def modlog_list(request):
+    page_title='修改历史'
+    if request.method == "GET":
+        modlogform = ModLogSearchForm(request.GET)
+
+        if modlogform.is_valid():
+            data = modlogform.cleaned_data
+            typename = data.get('typename', '')
+            asset = data.get('asset', '')
+            moduser = data.get('moduser', '')
+            field = data.get('field', '')
+            comment = data.get('comment', '')
+            starttime = data.get('starttime')
+            endtime = datetime.datetime.now() if not data.get('endtime') else data.get('endtime')
+            # if endtime == None:
+            #     endtime = datetime.datetime.now()
+
+            if starttime ==  None or starttime == 'None':
+                list_items = ModLog.objects.filter(typename__icontains = typename,
+                                                    asset__icontains = asset,
+                                                    moduser__icontains = moduser,
+                                                    field__icontains = field,
+                                                    comment__icontains = comment,
+                                                    mtime__lte=endtime
+                                                    )
+            else:
+                list_items = ModLog.objects.filter(typename__icontains = typename,
+                                                    asset__icontains = asset,
+                                                    moduser__icontains = moduser,
+                                                    field__icontains = field,
+                                                    comment__icontains = comment,
+                                                    mtime__range=(starttime, endtime)
+                                                    )
+            # count = list_items.count()
+            # paginator = Paginator(list_items ,15)
+            #
+            # try:
+            #     page = int(request.GET.get('page', '1'))
+            # except ValueError:
+            #     page = 1
+            # try:
+            #     list_items = paginator.page(page)
+            # except :
+            #     list_items = paginator.page(paginator.num_pages)
+            #
+            # return render(request, 'assets/modlog_list.html', locals())
+            list_items = ModLogTable(list_items)
+            RequestConfig(request).configure(list_items)
+            return render(request, 'assets/modlog_list.html', locals())
+    else:
+        modlogform = ModLogSearchForm()
+    return render(request, "assets/modlog_list.html", locals())
