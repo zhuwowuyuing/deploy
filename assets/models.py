@@ -9,11 +9,7 @@ class Status(models.Model):
         verbose_name = '使用状态'
         verbose_name_plural = verbose_name
 
-<<<<<<< HEAD
-    status          = models.CharField('使用状态',max_length=60, primary_key=True)
-=======
     status          = models.CharField('使用状态',max_length=60, unique=True)
->>>>>>> assets
     exclusive       = models.BooleanField('不可用', default=False)
 
     def __unicode__(self):
