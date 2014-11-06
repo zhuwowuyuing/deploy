@@ -6,28 +6,28 @@
 
     <a href="#Servers-menu" class="nav-header" data-toggle="collapse"><i class="whhg-icon-server"></i>&nbsp&nbsp服务器信息</a>
     <ul id="Servers-menu" class="nav nav-list collapse in">
-        <li><a href="/servers/list">服务器信息列表</a></li>
-        <li><a href="/servers/names">服务器信息汇总</a></li>
-        <li><a href="/servers/errors">服务器错误信息</a></li>
-        <li><a href="/servers/offline">离线服务器列表</a></li>
-        <li><a href="/servers/checkerror">重启minions错误信息</a></li>
+        <li><a href="{% url "servers.views.server_list"  %}">服务器信息列表</a></li>
+        <li><a href="{% url "servers.views.names" %}">服务器信息汇总</a></li>
+        <li><a href="{% url "servers.views.server_errors" %}">服务器错误信息</a></li>
+        <li><a href="{% url "servers.views.server_offline" %}">离线服务器列表</a></li>
+        <li><a href="{% url "servers.views.server_checkerror" %}">重启minions错误信息</a></li>
     </ul>
 
     <a href="#Assets-menu" class="nav-header" data-toggle="collapse"><i class="whhg-icon-server"></i>&nbsp&nbsp资产信息</a>
     <ul id="Assets-menu" class="nav nav-list collapse in">
-        <li><a href="/assets/server/list">服务器列表</a></li>
-        <li><a href="/assets/server/search">搜索服务器</a></li>
-        <li><a href="/assets/server/create">新增服务器</a></li>
+        <li><a href="{% url "assets.views.subtype_list" %}">服务器列表</a></li>
+        <li><a href="{% url "assets.views.server_search" %}">搜索服务器</a></li>
+        <li><a href="{% url "assets.views.server_create" %}">新增服务器</a></li>
         <li class="divider"></li>
-        <li><a href="/assets/status/list">使用状态列表</a></li>
-        <li><a href="/assets/status/create">新增使用状态</a></li>
+        <li><a href="{% url "assets.views.status_list" %}">使用状态列表</a></li>
+        <li><a href="{% url "assets.views.status_create" %}">新增使用状态</a></li>
         <li class="divider"></li>
-        <li><a href="/assets/type/create">新增设备类别</a></li>
-        <li><a href="/assets/subtype/create">新增子设备类别</a></li>
-        <li><a href="/assets/type/list">设备类别列表</a></li>
-        <li><a href="/assets/subtype/list">设备子类别列表</a></li>
+        <li><a href="{% url "assets.views.type_create" %}">新增设备类别</a></li>
+        <li><a href="{% url "assets.views.subtype_create" %}">新增子设备类别</a></li>
+        <li><a href="{% url "assets.views.type_list" %}">设备类别列表</a></li>
+        <li><a href="{% url "assets.views.subtype_list" %}">设备子类别列表</a></li>
         <li class="divider"></li>
-        <li><a href="/assets/modlog/list">修改历史列表</a></li>
+        <li><a href="{% url "assets.views.modlog_list" %}">修改历史列表</a></li>
         <li class="divider"></li>
     </ul>
 
