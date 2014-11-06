@@ -198,6 +198,11 @@ def server_edit(request, asset):
         maninfo.asset = device
         maninfo.save()
 
+    try:
+        machine_instance = BaseInfo.objects.get(hostname=Server.objects.get(asset=asset).hostname)
+    except:
+        machine_instance = None
+
     return render(request, 'assets/server_edit.html', locals())
 
 #
@@ -218,8 +223,12 @@ def server_view(request, asset):
             server_form.fields[field].widget.attrs['readonly'] = True
     for field in maninfo_form.fields.keys():
             maninfo_form.fields[field].widget.attrs['readonly'] = True
+
     if server_instance.hostname:
-        machine_instance = BaseInfo.objects.get(hostname=server_instance.hostname)
+        try:
+            machine_instance = BaseInfo.objects.get(hostname=server_instance.hostname)
+        except:
+            machine_instance = None
     else:
         machine_instance = None
 
@@ -245,8 +254,12 @@ def server_search(request):
             data = searchform.cleaned_data
             asset = data.get('asset','')
             asset_old = data.get('asset_old','')
-            type = '' if data.get('type','') == None else data.get('type')
-            subtype = '' if data.get('subtype','') == None else data.get('subtype')
+            status = data.get('status','')
+            # type = '' if data.get('type','') == None else data.get('type')
+            # subtype = '' if data.get('subtype','') == None else data.get('subtype')
+            # status = '' if data.get('status','') == None else data.get('status')
+            type = data.get('type','')
+            subtype = data.get('subtype','')
             manufacturer = data.get('manufacturer','')
             model = data.get('model','')
             building = data.get('building','')
@@ -254,20 +267,39 @@ def server_search(request):
             consignee = data.get('consignee','')
             hostname = data.get('hostname','')
             vendor = data.get('vendor','')
-            status = '' if data.get('status','') == None else data.get('status')
+
+            # list_items = Devices.objects.filter(asset__icontains = asset,
+            #                                     asset_old__icontains = asset_old,
+            #                                     type__name__icontains = type,
+            #                                     subtype__name__icontains = subtype,
+            #                                     manufacturer__icontains = manufacturer,
+            #                                     model__icontains = model,
+            #                                     server__building__icontains = building,
+            #                                     server__location__icontains = location,
+            #                                     server__consignee__icontains = consignee,
+            #                                     server__hostname__icontains = hostname,
+            #                                     maninfo__vendor__icontains = vendor,
+            #                                     status__status__icontains = status
+            #                                     )
             list_items = Devices.objects.filter(asset__icontains = asset,
                                                 asset_old__icontains = asset_old,
-                                                type__name__icontains = type,
-                                                subtype__name__icontains = subtype,
                                                 manufacturer__icontains = manufacturer,
                                                 model__icontains = model,
                                                 server__building__icontains = building,
                                                 server__location__icontains = location,
                                                 server__consignee__icontains = consignee,
                                                 server__hostname__icontains = hostname,
-                                                maninfo__vendor__icontains = vendor,
-                                                status__status__icontains = status
+                                                maninfo__vendor__icontains = vendor
                                                 )
+
+            if status:
+                list_items = list_items.filter(status=status)
+            if  type:
+                list_items = list_items.filter(type=type)
+            if subtype:
+                list_items = list_items.filter(subtype=subtype)
+
+
             count = list_items.count()
             paginator = Paginator(list_items ,15)
 
