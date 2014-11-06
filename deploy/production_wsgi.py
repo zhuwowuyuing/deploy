@@ -27,7 +27,7 @@ site.addsitedir(ve_path)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(BASE_DIR)
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "deploy.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "deploy.production_settings")
 
 # Activate your virtual env
 activate_env=os.path.expanduser("/data/website/deploy_web/bin/activate_this.py")

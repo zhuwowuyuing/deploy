@@ -97,7 +97,7 @@
 
                 <div align="center">
                     {% if list_items.has_previous %}
-                        <a href="?asset={{ asset }}&asset_old={{ asset_old }}&type={{ type }}&subtype={{ subtype }}&status={{ status }}&manufacturer={{ manufacturer }}&model={{ model }}&building={{ building }}&location={{ location }}&consignee={{ consignee }}&hostname={{ hostname }}&vendor={{ vendor }}&page={{ list_items.previous_page_number }}">Previous</a>
+                        <a href="?asset={{ asset }}&asset_old={{ asset_old }}&type={{ type.id }}&subtype={{ subtype.id }}&status={{ status.id }}&manufacturer={{ manufacturer }}&model={{ model }}&building={{ building }}&location={{ location }}&consignee={{ consignee }}&hostname={{ hostname }}&vendor={{ vendor }}&page={{ list_items.previous_page_number }}">Previous</a>
                     {% endif %}
 
                     <span class="current">
@@ -105,7 +105,7 @@
                     </span>
 
                     {% if list_items.has_next %}
-                        <a href="?asset={{ asset }}&asset_old={{ asset_old }}&type={{ type }}&subtype={{ subtype }}&status={{ status }}&manufacturer={{ manufacturer }}&model={{ model }}&building={{ building }}&location={{ location }}&consignee={{ consignee }}&hostname={{ hostname }}&vendor={{ vendor }}&page={{ list_items.next_page_number }}">Next</a>
+                        <a href="?asset={{ asset }}&asset_old={{ asset_old }}&type={{ type.id }}&subtype={{ subtype.id }}&status={{ status.id }}&manufacturer={{ manufacturer }}&model={{ model }}&building={{ building }}&location={{ location }}&consignee={{ consignee }}&hostname={{ hostname }}&vendor={{ vendor }}&page={{ list_items.next_page_number }}">Next</a>
                     {% endif %}
                     <span><p>Total:{{ count }}</p></span>
                 </div>
