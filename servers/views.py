@@ -87,19 +87,23 @@ def server_view(request, hostname):
     machine_instance = BaseInfo.objects.get(hostname=hostname)
 
     # asset info
-    server_instance = Server.objects.get(hostname=machine_instance.hostname)
-    device_instance = server_instance.asset
-    maninfo_instance = device_instance.maninfo
-    device_form = DeviceForm(None, instance = device_instance)
-    server_form = ServerForm(None, instance = server_instance)
-    maninfo_form = ManInfoForm(None, instance = maninfo_instance)
+    try:
+        server_instance = Server.objects.get(hostname=machine_instance.hostname)
+    except:
+        server_instance = None
 
-    for field in device_form.fields.keys():
-        device_form.fields[field].widget.attrs['disabled'] = True
-    for field in server_form.fields.keys():
-        server_form.fields[field].widget.attrs['disabled'] = True
-    for field in maninfo_form.fields.keys():
-        maninfo_form.fields[field].widget.attrs['disabled'] = True
+    if server_instance:
+        device_instance = server_instance.asset
+        maninfo_instance = device_instance.maninfo
+        device_form = DeviceForm(None, instance = device_instance)
+        server_form = ServerForm(None, instance = server_instance)
+        maninfo_form = ManInfoForm(None, instance = maninfo_instance)
+        for field in device_form.fields.keys():
+            device_form.fields[field].widget.attrs['disabled'] = True
+        for field in server_form.fields.keys():
+            server_form.fields[field].widget.attrs['disabled'] = True
+        for field in maninfo_form.fields.keys():
+            maninfo_form.fields[field].widget.attrs['disabled'] = True
 
     return render(request, 'servers/view.html', locals())
 
