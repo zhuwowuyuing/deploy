@@ -152,3 +152,6 @@ def server_checkerror(request):
     error_table = CheckErrorTable(error_list)
     RequestConfig(request).configure(error_table)
     return render(request,'servers/checkerror.html', locals())
+
+def index(request):
+    return render(request, 'index.html', locals())
