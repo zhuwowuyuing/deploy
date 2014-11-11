@@ -13,6 +13,8 @@ from django_tables2 import RequestConfig
 import salt.config
 import salt.key
 import salt.client
+from salt import runner
+import salt
 from assets.models import *
 from assets.forms import *
 
@@ -115,15 +117,20 @@ def server_errors(request):
 
 # 获取offline 列表
 def salt_status():
-    __opts__ = salt.config.master_config('/etc/salt/master')
-    client = salt.client.LocalClient(__opts__['conf_file'])
-    minions = client.cmd('*', 'test.ping', timeout=__opts__['timeout'])
-    key = salt.key.Key(__opts__)
-    keys = key.list_keys()
-    ret = {}
-    ret['up'] = sorted(minions)
-    ret['down'] = sorted(set(keys['minions']) - set(minions))
-    return ret['down']
+    # __opts__ = salt.config.master_config('/etc/salt/master')
+    # client = salt.client.LocalClient(__opts__['conf_file'])
+    # minions = client.cmd('*', 'test.ping', timeout=__opts__['timeout'])
+    # key = salt.key.Key(__opts__)
+    # keys = key.list_keys()
+    # ret = {}
+    # ret['up'] = sorted(minions)
+    # ret['down'] = sorted(set(keys['minions']) - set(minions))
+    # return ret['down']
+    opts = salt.config.master_config('/etc/salt/master')
+    runner = salt.runner.RunnerClient(opts)
+    ret = runner.cmd('manage.down', [])
+    return ret
+
 
 # 暂时offline服务器
 def server_offline(request):
