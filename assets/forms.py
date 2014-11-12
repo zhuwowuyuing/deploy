@@ -3,9 +3,8 @@ __author__ = 'liangnaihua'
 
 from django import forms
 from django.forms import ModelChoiceField
-from models import Devices, Status, Server, ManInfo, ModLog, Type, Subtype
+from models import Devices, Status, Server, ManInfo, ModLog, Type, Subtype, Network, OtherEmq
 import datetime
-from django.contrib.admin.widgets import AdminDateWidget
 
 
 # 资产搜索表单
@@ -22,6 +21,30 @@ class AssetSearch(forms.Form):
     consignee       = forms.CharField(label='托管编号',max_length=60, required=False)
     hostname        = forms.CharField(label='主机名',max_length=60, required=False)
     vendor          = forms.CharField(label='供应商',max_length=200, required=False)
+
+class NetworkSearch(forms.Form):
+    asset           = forms.CharField(label='资产编号', max_length=60, required=False)
+    asset_old       = forms.CharField(label='旧资产编号', max_length=60, required=False)
+    type            = forms.ModelChoiceField(label='类别', queryset=Type.objects.all(), required=False)
+    subtype         = forms.ModelChoiceField(label='子类别', queryset=Subtype.objects.all(), required=False)
+    manufacturer    = forms.CharField(label='品牌', max_length=60, required=False)
+    model           = forms.CharField(label='型号', max_length=100, required=False)
+    status		    = forms.ModelChoiceField(label='使用状态', queryset=Status.objects.filter(exclusive=False), required=False)
+    building        = forms.CharField(label='机房(所处位置)',max_length=60, required=False)
+    location        = forms.CharField(label='机柜',max_length=60, required=False)
+    consignee       = forms.CharField(label='托管编号',max_length=60, required=False)
+
+class OtherEmqSearch(forms.Form):
+    asset           = forms.CharField(label='资产编号', max_length=60, required=False)
+    asset_old       = forms.CharField(label='旧资产编号', max_length=60, required=False)
+    type            = forms.ModelChoiceField(label='类别', queryset=Type.objects.all(), required=False)
+    subtype         = forms.ModelChoiceField(label='子类别', queryset=Subtype.objects.all(), required=False)
+    manufacturer    = forms.CharField(label='品牌', max_length=60, required=False)
+    model           = forms.CharField(label='型号', max_length=100, required=False)
+    status		    = forms.ModelChoiceField(label='使用状态', queryset=Status.objects.filter(exclusive=False), required=False)
+    building        = forms.CharField(label='机房(所处位置)',max_length=60, required=False)
+    location        = forms.CharField(label='机柜',max_length=60, required=False)
+    consignee       = forms.CharField(label='托管编号',max_length=60, required=False)
 
 # 资产信息表单
 class AssetForm(forms.Form):
@@ -129,3 +152,19 @@ class ModLogSearchForm(forms.Form):
     comment         =forms.CharField(label='备注',max_length=500, required=False)
     starttime       =forms.DateTimeField(label="修改时间从", required=False)
     endtime         =forms.DateTimeField(label="修改时间至", required=False)
+
+class NetworkForm(forms.ModelForm):
+    class Meta:
+        model = Network
+        exclude = ['asset'] # uncomment this line and specify any field to exclude it from the form
+
+    def __init__(self, *args, **kwargs):
+        super(NetworkForm, self).__init__(*args, **kwargs)
+
+class OtherEmqForm(forms.ModelForm):
+    class Meta:
+        model = OtherEmq
+        exclude = ['asset'] # uncomment this line and specify any field to exclude it from the form
+
+    def __init__(self, *args, **kwargs):
+        super(OtherEmqForm, self).__init__(*args, **kwargs)

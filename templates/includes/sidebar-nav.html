@@ -15,9 +15,15 @@
 
     <a href="#Assets-menu" class="nav-header" data-toggle="collapse"><i class="whhg-icon-server"></i>&nbsp&nbsp资产信息</a>
     <ul id="Assets-menu" class="nav nav-list collapse in">
-        <li><a href="{% url "assets.views.subtype_list" %}">服务器列表</a></li>
+        {#        <li><a href="{% url "assets.views.server_list" %}">服务器列表</a></li>#}
         <li><a href="{% url "assets.views.server_search" %}">搜索服务器</a></li>
+        <li><a href="{% url "assets.views.network_search" %}">搜索网络设备</a></li>
+        <li><a href="{% url "assets.views.otheremq_search" %}">搜索其他设备</a></li>
         <li><a href="{% url "assets.views.server_create" %}">新增服务器</a></li>
+        <li><a href="{% url "assets.views.network_create" %}">新增网络设备</a></li>
+        <li><a href="{% url "assets.views.otheremq_create" %}">新增其他设备</a></li>
+
+
         <li class="divider"></li>
         <li><a href="{% url "assets.views.status_list" %}">使用状态列表</a></li>
         <li><a href="{% url "assets.views.status_create" %}">新增使用状态</a></li>
