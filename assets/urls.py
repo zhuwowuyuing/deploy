@@ -25,4 +25,18 @@ urlpatterns = patterns('',
     url(r'^server/delete/(?P<asset>[^/]+)/$', 'assets.views.server_delete'),
     url(r'^server/search/$', 'assets.views.server_search'),
     url(r'^modlog/list/$', 'assets.views.modlog_list'),
+
+    # url(r'^network/list/', 'assets.views.network_list'),
+    url(r'^network/create/', 'assets.views.network_create'),
+    url(r'^network/edit/(?P<asset>[^/]+)/$', 'assets.views.network_edit'),
+    url(r'^network/view/(?P<asset>[^/]+)/$', 'assets.views.network_view'),
+    url(r'^network/delete/(?P<asset>[^/]+)/$', 'assets.views.network_delete'),
+    url(r'^network/search/$', 'assets.views.network_search'),
+
+        # url(r'^otheremq/list/', 'assets.views.otheremq_list'),
+    url(r'^otheremq/create/', 'assets.views.otheremq_create'),
+    url(r'^otheremq/edit/(?P<asset>[^/]+)/$', 'assets.views.otheremq_edit'),
+    url(r'^otheremq/view/(?P<asset>[^/]+)/$', 'assets.views.otheremq_view'),
+    url(r'^otheremq/delete/(?P<asset>[^/]+)/$', 'assets.views.otheremq_delete'),
+    url(r'^otheremq/search/$', 'assets.views.otheremq_search'),
 )

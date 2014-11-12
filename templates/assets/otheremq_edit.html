@@ -1,0 +1,137 @@
+
+{% extends "base.html" %}
+
+{##}
+{#{% block title %} Servers - Edit {% endblock %}#}
+{#{% block heading %} <h1> Servers</h1><h2> Edit </h2> {% endblock %}#}
+
+
+{% block content %}
+    <div class="well">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#home" data-toggle="tab">编辑服务器信息</a></li>
+            <li><a href="#history" data-toggle="tab">修改历史</a></li>
+        </ul>
+        <div id="myTabContent" class="tab-content">
+
+            <div class="tab-pane active in" id="home">
+                <table class="table">
+                    {% if device_form %}
+                        <form action="" method="POST"> {% csrf_token %}
+                            <table class="table">
+                                <tr>
+                                    <td>{{ device_form.asset.label}}</td><td>{{device_form.asset}} {% if device_form.asset.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error"> {{ device_form.asset.errors }} </div></td>
+                                    <td>{{ device_form.asset_old.label }}</td><td>{{device_form.asset_old}} {% if device_form.asset_old.field.required %}<strong class="text-error">*</strong>{% endif %} <div class="text-error"> {{ device_form.asset_old.errors }} </div></td>
+                                </tr>
+                                <tr>
+
+                                    <td>{{ device_form.district.label }}</td><td>{{device_form.district}} {% if device_form.district.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error"> {{ device_form.district.errors }}  </div> </td>
+                                    <td>{{ device_form.company.label }}</td><td>{{device_form.company}} {% if device_form.company.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error"> {{ device_form.company.errors }}  </div> </td>
+                                </tr>
+                                <tr>
+                                    <td>{{ device_form.type.label }}</td><td>{{ device_form.type}} {% if device_form.type.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ device_form.type.errors }} </div></td>
+                                    <td>{{ device_form.subtype.label }}</td><td>{{ device_form.subtype}} {% if device_form.subtype.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ device_form.subtype.errors }} </div></td>
+                                </tr>
+                                <tr>
+                                    <td>{{ device_form.status.label }}</td><td>{{device_form.status}} {% if device_form.status.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ device_form.status.errors }} </div></td>
+                                    <td>{{ device_form.manufacturer.label }}</td><td>{{device_form.manufacturer}} {% if device_form.manufacturer.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ device_form.manufacturer.errors }} </div></td>
+                                </tr>
+                                <tr>
+                                    <td>{{ device_form.model.label }}</td><td>{{ device_form.model}} {% if device_form.model.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ device_form.model.errors}}</div></td>
+                                    <td>{{ device_form.serialno.label }}</td><td>{{ device_form.serialno}} {% if device_form.serialno.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ device_form.serialno.errors}}</div></td>
+                                </tr>
+                                <tr>
+                                    <td>{{ otheremq_form.size.label }}</td><td>{{ otheremq_form.size}} {% if otheremq_form.size.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ otheremq_form.size.errors}} </div></td>                                  
+                                    <td>{{ otheremq_form.building.label }}</td><td>{{ otheremq_form.building}} {% if otheremq_form.building.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ otheremq_form.building.errors }} </div></td>
+                                </tr>
+                                <tr>
+                                    <td>{{ otheremq_form.location.label }}</td><td>{{ otheremq_form.location}} {% if otheremq_form.locationfield.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ otheremq_form.location.errors }} </div></td>
+                                    <td>{{ otheremq_form.consignee.label }}</td><td>{{ otheremq_form.consignee}} {% if otheremq_form.consignee.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ otheremq_form.consignee.errors }} </div></td>
+                                </tr>
+                               
+                                <tr>
+                                    <td>{{ maninfo_form.administrator.label }}</td><td>{{ maninfo_form.administrator }} {% if maninfo_form.administrator.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ maninfo_form.administrator.errors }} </div></td>
+                                    <td>{{ maninfo_form.warehousedate.label }}</td><td>{{ maninfo_form.warehousedate }} {% if maninfo_form.warehousedate.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ maninfo_form.warehousedate.errors }} </div></td>
+                                </tr>
+                                <tr>
+                                    <td>{{ maninfo_form.receivedate.label }}</td><td>{{ maninfo_form.receivedate }} {% if maninfo_form.receivedate.field.required %}<strong class="text-error">*</strong>{% endif %} <div class="text-error">{{ maninfo_form.receivedate.errors }} </div></td>
+                                    <td>{{ maninfo_form.warrantyexpirationdate.label }}</td><td>{{ maninfo_form.warrantyexpirationdate }} {% if maninfo_form.warrantyexpirationdate.field.required %}<strong class="text-error">*</strong>{% endif %} <div class="text-error">{{ maninfo_form.warrantyexpirationdate.errors }} </div></td>
+                                </tr>
+                                <tr>
+                                    <td>{{ maninfo_form.scrapDate.label }}</td><td>{{ maninfo_form.scrapDate }} {% if maninfo_form.scrapDate.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ maninfo_form.scrapDate.errors }} </div></td>
+                                    <td>{{ maninfo_form.purchase_date.label }}</td><td>{{ maninfo_form.purchase_date }} {% if maninfo_form.purchase_date.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ maninfo_form.purchase_date.errors }} </div></td>
+                                </tr>
+                                <tr>
+                                    <td>{{ maninfo_form.accounting_date.label }}</td><td>{{ maninfo_form.accounting_date }} {% if maninfo_form.accounting_date.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ maninfo_form.accounting_date.errors }} </div></td>
+                                    <td>{{ maninfo_form.purchase_cost.label }}</td><td>{{ maninfo_form.purchase_cost }} {% if maninfo_form.purchase_cost.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ maninfo_form.purchase_cost.errors }} </div></td>
+                                </tr>
+                                <tr>
+                                    <td>{{ maninfo_form.account_cost.label }}</td><td>{{ maninfo_form.account_cost }} {% if maninfo_form.account_cost.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ maninfo_form.account_cost.errors }} </div></td>
+                                    <td>{{ maninfo_form.vendor.label }}</td><td>{{ maninfo_form.vendor }} {% if maninfo_form.vendor.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ maninfo_form.vendor.errors }} </div></td>
+                                </tr>
+                                <tr>
+                                    <td>{{ maninfo_form.vendor_contacts.label }}</td><td>{{ maninfo_form.vendor_contacts }} {% if maninfo_form.vendor_contacts.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ maninfo_form.vendor_contacts.errors }} </div></td>
+                                    <td>{{ maninfo_form.accounting_info.label }}</td><td>{{ maninfo_form.accounting_info }} {% if maninfo_form.asset.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ maninfo_form.accounting_info.errors }} </div></td>
+                                </tr>
+                                <tr>
+                                    <td>{{ maninfo_form.order_list.label }}</td><td>{{ maninfo_form.order_list }} {% if maninfo_form.order_list.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ maninfo_form.order_list.errors }} </div></td>
+                                    <td>{{ device_form.changeInfo.label }}</td><td>{{ device_form.changeInfo }} {% if device_form.changeInfo.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ device_form.changeInfo.errors }} </div></td>
+                                </tr>
+                                <tr>
+                                    <td>{{ device_form.comment.label }}</td><td>{{ device_form.comment }} {% if device_form.comment.field.required %}<strong class="text-error">*</strong>{% endif %}<div class="text-error">{{ device_form.comment.errors }} </div></td>
+                                    <td></td><td></td>
+                                </tr>
+                                <tr><td colspan="2" align="right"><input type="submit" value="编辑" /></td></tr>
+                            </table>
+                        </form>
+                    {% else %}
+                        <div align="center">
+                            <strong>没有相关修改历史</strong>
+                        </div>
+                    {% endif %}
+                </table>
+            </div>
+
+            <div class="tab-pane fade" id="history">
+                {% if list_log %}
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>修改时间</th>
+                            <th>修改人</th>
+                            <th>修改字段</th>
+                            <th>修改前值</th>
+                            <th>修改后值</th>
+                            <th>备注</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in list_log %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ item.mtime }}</td>
+                                <td>{{ item.moduser }}</td>
+                                <td>{{ item.field }}</td>
+                                <td>{{ item.oldvalue }}</td>
+                                <td>{{ item.newvalue }}</td>
+                                <td>{{ item.comment }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div align="center">
+                        <strong>没有相关修改历史</strong>
+                    </div>
+                {% endif %}
+            </div>
+    </div>
+
+    {#    <form action="" method="post"> {% csrf_token %}#}
+    {#    {{ device_form.as_p }}#}
+    {#    {{ otheremq_form }}#}
+    {#    {{ maninfo_form }}#}
+    {#    <input type="submit" value="Submit">#}
+    {#    </form>#}
+{% endblock %}

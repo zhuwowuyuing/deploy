@@ -95,7 +95,7 @@ class ManInfo(models.Model):
     scrapDate       = models.DateField('报废时间', blank=True, null=True)
     purchase_date   = models.DateField('采购时间', blank=True)
     purchase_cost   = models.FloatField('采购价格',max_length=60, blank=True)
-    accounting_date = models.DateField('入账时间', blank=True)
+    accounting_date = models.DateField('入账时间', blank=True,null=True)
     account_cost    = models.FloatField('入账价格',max_length=60, blank=True)
     vendor          = models.CharField('供应商',max_length=200, blank=True)
     vendor_contacts = models.TextField('供应商联系方式',max_length=2000, blank=True)
@@ -122,3 +122,33 @@ class ModLog(models.Model):
 
     def __unicode__(self):
         return u'%s %s %s %s %s' % (self.asset, self.mtime, self.field, self.oldvalue, self.newvalue)
+
+class Network(models.Model):
+    class Meta:
+        verbose_name = '网络设备信息'
+        verbose_name_plural = verbose_name
+        ordering = ['asset']
+
+    asset           = models.OneToOneField(Devices)
+    size            = models.CharField('尺寸', max_length=60, blank=True)
+    building        = models.CharField('机房(所处位置)', max_length=60, blank=True)
+    location        = models.CharField('机柜', max_length=60, blank=True)
+    consignee       = models.CharField('托管编号', max_length=60, blank=True)
+
+    def __unicode__(self):
+        return u'%s' % (self.asset)
+
+class OtherEmq(models.Model):
+    class Meta:
+        verbose_name = '其他设备信息'
+        verbose_name_plural = verbose_name
+        ordering = ['asset']
+
+    asset           = models.OneToOneField(Devices)
+    size            = models.CharField('尺寸', max_length=60, blank=True)
+    building        = models.CharField('机房(所处位置)', max_length=60, blank=True)
+    location        = models.CharField('机柜', max_length=60, blank=True)
+    consignee       = models.CharField('托管编号', max_length=60, blank=True)
+
+    def __unicode__(self):
+        return u'%s' % (self.asset)

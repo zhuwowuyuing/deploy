@@ -131,7 +131,7 @@ def server_list(request):
     return render(request, 'assets/server_list.html', locals())
 
 def server_create(request):
-    page_title='新增资产记录'
+    page_title='新增服务器记录'
 
     if request.method == "POST":
         device_form     = DeviceForm(request.POST)
@@ -166,6 +166,7 @@ def modinfo(type, asset, field_list, old_obj, new_obj, username):
 # 编辑 assets
 def server_edit(request, asset):
     page_title='编辑服务器信息'
+    typename = "服务器"
     device_instance     = Devices.objects.get(asset =asset)
     server_instance     = Server.objects.get(asset = asset)
     maninfo_instance    = ManInfo.objects.get(asset = asset)
@@ -173,7 +174,7 @@ def server_edit(request, asset):
     old_device_instance = copy.deepcopy(device_instance)
     old_server_instance = copy.deepcopy(server_instance)
     old_maninfo_instance = copy.deepcopy(maninfo_instance)
-    list_log = ModLog.objects.filter(asset = asset, typename="服务器").order_by('-mtime')
+    list_log = ModLog.objects.filter(asset = asset, typename=typename).order_by('-mtime')
 
     device_form     = DeviceForm(request.POST or None, instance = device_instance)
     server_form     = ServerForm(request.POST or None, instance = server_instance)
@@ -198,6 +199,13 @@ def server_edit(request, asset):
         maninfo.asset = device
         maninfo.save()
 
+    if device_change_fields:
+        modinfo(type, asset, device_change_fields , old_device_instance, Devices.objects.get(asset =asset), request.user)
+    if server_change_fields:
+        modinfo(type, asset, server_change_fields , old_server_instance, Server.objects.get(asset =asset), request.user)
+    if maninfo_change_fields:
+        modinfo(type, asset, maninfo_change_fields , old_maninfo_instance, ManInfo.objects.get(asset =asset), request.user)
+
     try:
         machine_instance = BaseInfo.objects.get(hostname=Server.objects.get(asset=asset).hostname)
     except:
@@ -217,12 +225,11 @@ def server_view(request, asset):
     maninfo_form = ManInfoForm(None, instance = maninfo_instance)
 
     for field in device_form.fields.keys():
-            device_form.fields[field].widget.attrs['readonly'] = True
-    device_form.fields['status'].widget.attrs['disabled'] = True
+            device_form.fields[field].widget.attrs['disabled'] = True
     for field in server_form.fields.keys():
-            server_form.fields[field].widget.attrs['readonly'] = True
+            server_form.fields[field].widget.attrs['disabled'] = True
     for field in maninfo_form.fields.keys():
-            maninfo_form.fields[field].widget.attrs['readonly'] = True
+            maninfo_form.fields[field].widget.attrs['disabled'] = True
 
     if server_instance.hostname:
         try:
@@ -255,9 +262,6 @@ def server_search(request):
             asset = data.get('asset','')
             asset_old = data.get('asset_old','')
             status = data.get('status','')
-            # type = '' if data.get('type','') == None else data.get('type')
-            # subtype = '' if data.get('subtype','') == None else data.get('subtype')
-            # status = '' if data.get('status','') == None else data.get('status')
             type = data.get('type','')
             subtype = data.get('subtype','')
             manufacturer = data.get('manufacturer','')
@@ -268,19 +272,6 @@ def server_search(request):
             hostname = data.get('hostname','')
             vendor = data.get('vendor','')
 
-            # list_items = Devices.objects.filter(asset__icontains = asset,
-            #                                     asset_old__icontains = asset_old,
-            #                                     type__name__icontains = type,
-            #                                     subtype__name__icontains = subtype,
-            #                                     manufacturer__icontains = manufacturer,
-            #                                     model__icontains = model,
-            #                                     server__building__icontains = building,
-            #                                     server__location__icontains = location,
-            #                                     server__consignee__icontains = consignee,
-            #                                     server__hostname__icontains = hostname,
-            #                                     maninfo__vendor__icontains = vendor,
-            #                                     status__status__icontains = status
-            #                                     )
             list_items = Devices.objects.filter(asset__icontains = asset,
                                                 asset_old__icontains = asset_old,
                                                 manufacturer__icontains = manufacturer,
@@ -368,3 +359,301 @@ def modlog_list(request):
     else:
         modlogform = ModLogSearchForm()
     return render(request, "assets/modlog_list.html", locals())
+
+def network_list(request):
+    return 0
+def network_create(request):
+    page_title='新增网络设备记录'
+
+    if request.method == "POST":
+        device_form     = DeviceForm(request.POST)
+        network_form    = NetworkForm(request.POST)
+        maninfo_form    = ManInfoForm(request.POST)
+
+        if device_form.is_valid() and network_form.is_valid() and maninfo_form.is_valid():
+            device = device_form.save()
+            network = network_form.save(commit=False)
+            maninfo = maninfo_form.save(commit=False)
+            network.asset = device
+            network.save()
+            maninfo.asset = device
+            maninfo.save()
+    else:
+        device_form     = DeviceForm()
+        network_form    = NetworkForm()
+        maninfo_form    = ManInfoForm()
+
+    return render(request, 'assets/network_create.html', locals())
+
+def network_edit(request, asset):
+    page_title='编辑网络设备信息'
+    typename = '网络设备'
+    device_instance     = Devices.objects.get(asset =asset)
+    network_instance     = Network.objects.get(asset = asset)
+    maninfo_instance    = ManInfo.objects.get(asset = asset)
+
+    old_device_instance = copy.deepcopy(device_instance)
+    old_network_instance = copy.deepcopy(network_instance)
+    old_maninfo_instance = copy.deepcopy(maninfo_instance)
+    list_log = ModLog.objects.filter(asset = asset, typename=typename).order_by('-mtime')
+
+    device_form     = DeviceForm(request.POST or None, instance = device_instance)
+    network_form    = NetworkForm(request.POST or None, instance = network_instance)
+    maninfo_form    = ManInfoForm(request.POST or None, instance = maninfo_instance)
+    device_change_fields    = []
+    network_change_fields    = []
+    maninfo_change_fields   = []
+
+    if device_form.is_valid() and network_form.is_valid() and maninfo_form.is_valid():
+        if device_form.has_changed():
+            device_change_fields = device_form.changed_data
+        if network_form.has_changed():
+            network_change_fields = network_form.changed_data
+        if maninfo_form.has_changed():
+            maninfo_change_fields = maninfo_form.changed_data
+
+        device  = device_form.save()
+        network = network_form.save(commit=False)
+        maninfo = maninfo_form.save(commit=False)
+        network.asset = device
+        network.save()
+        maninfo.asset = device
+        maninfo.save()
+
+    if device_change_fields:
+        modinfo(typename, asset, device_change_fields , old_device_instance, Devices.objects.get(asset =asset), request.user)
+    if network_change_fields:
+        modinfo(typename, asset, network_change_fields , old_network_instance, Network.objects.get(asset =asset), request.user)
+    if maninfo_change_fields:
+        modinfo(typename, asset, maninfo_change_fields , old_maninfo_instance, ManInfo.objects.get(asset =asset), request.user)
+
+    return render(request, 'assets/network_edit.html', locals())
+
+def network_view(request, asset):
+    page_title='网络设备详情'
+    typename = '网络设备'
+    device_instance = Devices.objects.get(asset = asset)
+    network_instance = device_instance.network
+    maninfo_instance = device_instance.maninfo
+    device_form = DeviceForm(None, instance = device_instance)
+    network_form = NetworkForm(None, instance = network_instance)
+    maninfo_form = ManInfoForm(None, instance = maninfo_instance)
+
+    for field in device_form.fields.keys():
+            device_form.fields[field].widget.attrs['disabled'] = True
+    for field in network_form.fields.keys():
+            network_form.fields[field].widget.attrs['disabled'] = True
+    for field in maninfo_form.fields.keys():
+            maninfo_form.fields[field].widget.attrs['disabled'] = True
+
+    list_log = ModLog.objects.filter(asset = asset, typename=typename).order_by('-mtime')
+    return render(request, 'assets/network_view.html', locals())
+
+def network_delete(request, asset):
+    typename="网络设备"
+    Devices.objects.get(asset = asset).delete()
+    log = ModLog(typename=typename, asset=asset, mtime= datetime.datetime.now(), \
+                              moduser=request.user, comment="删除网络设备")
+    log.save()
+    searchform = NetworkSearch()
+    return HttpResponseRedirect("/assets/network/search/",locals())
+
+def network_search(request):
+    page_title='搜索网络设备'
+    if request.method == "GET":
+        searchform = NetworkSearch(request.GET)
+        if searchform.is_valid():
+            data = searchform.cleaned_data
+            asset = data.get('asset','')
+            asset_old = data.get('asset_old','')
+            status = data.get('status','')
+            type = data.get('type','')
+            subtype = data.get('subtype','')
+            manufacturer = data.get('manufacturer','')
+            model = data.get('model','')
+            building = data.get('building','')
+            location = data.get('location','')
+            consignee = data.get('consignee','')
+
+
+            list_items = Devices.objects.filter(asset__icontains = asset,
+                                                asset_old__icontains = asset_old,
+                                                manufacturer__icontains = manufacturer,
+                                                model__icontains = model,
+                                                network__building__icontains = building,
+                                                network__location__icontains = location,
+                                                network__consignee__icontains = consignee,
+                                                )
+
+            if status:
+                list_items = list_items.filter(status=status)
+            if  type:
+                list_items = list_items.filter(type=type)
+            if subtype:
+                list_items = list_items.filter(subtype=subtype)
+
+
+            count = list_items.count()
+            paginator = Paginator(list_items ,15)
+
+            try:
+                page = int(request.GET.get('page', '1'))
+            except ValueError:
+                page = 1
+            try:
+                list_items = paginator.page(page)
+            except :
+                list_items = paginator.page(paginator.num_pages)
+    else:
+        searchform = NetworkSearch()
+
+    return render(request, "assets/network_search.html", locals())
+
+def otheremq_list(request):
+    return 0
+def otheremq_create(request):
+    page_title='新增其他设备记录'
+
+    if request.method == "POST":
+        device_form     = DeviceForm(request.POST)
+        otheremq_form   = OtherEmqForm(request.POST)
+        maninfo_form    = ManInfoForm(request.POST)
+
+        if device_form.is_valid() and otheremq_form.is_valid() and maninfo_form.is_valid():
+            device = device_form.save()
+            otheremq = otheremq_form.save(commit=False)
+            maninfo = maninfo_form.save(commit=False)
+            otheremq.asset = device
+            otheremq.save()
+            maninfo.asset = device
+            maninfo.save()
+    else:
+        device_form     = DeviceForm()
+        otheremq_form   = OtherEmqForm()
+        maninfo_form    = ManInfoForm()
+
+    return render(request, 'assets/otheremq_create.html', locals())
+
+def otheremq_edit(request, asset):
+    page_title='编辑其他设备信息'
+    typename = "其他设备"
+    device_instance     = Devices.objects.get(asset =asset)
+    otheremq_instance     = OtherEmq.objects.get(asset = asset)
+    maninfo_instance    = ManInfo.objects.get(asset = asset)
+
+    old_device_instance = copy.deepcopy(device_instance)
+    old_otheremq_instance = copy.deepcopy(otheremq_instance)
+    old_maninfo_instance = copy.deepcopy(maninfo_instance)
+    list_log = ModLog.objects.filter(asset = asset, typename=typename).order_by('-mtime')
+
+    device_form     = DeviceForm(request.POST or None, instance = device_instance)
+    otheremq_form   = OtherEmqForm(request.POST or None, instance = otheremq_instance)
+    maninfo_form    = ManInfoForm(request.POST or None, instance = maninfo_instance)
+    device_change_fields    = []
+    otheremq_change_fields  = []
+    maninfo_change_fields   = []
+
+    if device_form.is_valid() and otheremq_form.is_valid() and maninfo_form.is_valid():
+        if device_form.has_changed():
+            device_change_fields = device_form.changed_data
+        if otheremq_form.has_changed():
+            otheremq_change_fields = otheremq_form.changed_data
+        if maninfo_form.has_changed():
+            maninfo_change_fields = maninfo_form.changed_data
+
+        device = device_form.save()
+        otheremq = otheremq_form.save(commit=False)
+        maninfo = maninfo_form.save(commit=False)
+        otheremq.asset = device
+        otheremq.save()
+        maninfo.asset = device
+        maninfo.save()
+
+    if device_change_fields:
+        modinfo(typename, asset, device_change_fields , old_device_instance, Devices.objects.get(asset =asset), request.user)
+    if otheremq_change_fields:
+        modinfo(typename, asset, otheremq_change_fields , old_otheremq_instance, OtherEmq.objects.get(asset =asset), request.user)
+    if maninfo_change_fields:
+        modinfo(typename, asset, maninfo_change_fields , old_maninfo_instance, ManInfo.objects.get(asset =asset), request.user)
+
+    return render(request, 'assets/otheremq_edit.html', locals())
+
+def otheremq_view(request, asset):
+    page_title='其他设备详情'
+    typename = '其他设备'
+    device_instance = Devices.objects.get(asset = asset)
+    otheremq_instance = device_instance.otheremq
+    maninfo_instance = device_instance.maninfo
+    device_form = DeviceForm(None, instance = device_instance)
+    otheremq_form = OtherEmqForm(None, instance = otheremq_instance)
+    maninfo_form = ManInfoForm(None, instance = maninfo_instance)
+
+    for field in device_form.fields.keys():
+            device_form.fields[field].widget.attrs['disabled'] = True
+    for field in otheremq_form.fields.keys():
+            otheremq_form.fields[field].widget.attrs['disabled'] = True
+    for field in maninfo_form.fields.keys():
+            maninfo_form.fields[field].widget.attrs['disabled'] = True
+
+    list_log = ModLog.objects.filter(asset = asset, typename=typename).order_by('-mtime')
+    return render(request, 'assets/otheremq_view.html', locals())
+
+def otheremq_delete(request, asset):
+    typename="其他设备"
+    Devices.objects.get(asset = asset).delete()
+    log = ModLog(typename=typename, asset=asset, mtime= datetime.datetime.now(), \
+                              moduser=request.user, comment="删除其他设备")
+    log.save()
+    searchform = OtherEmqSearch()
+    return HttpResponseRedirect("/assets/otheremq/search/",locals())
+
+def otheremq_search(request):
+    page_title='搜索网络设备'
+    if request.method == "GET":
+        searchform = OtherEmqSearch(request.GET)
+        if searchform.is_valid():
+            data = searchform.cleaned_data
+            asset = data.get('asset','')
+            asset_old = data.get('asset_old','')
+            status = data.get('status','')
+            type = data.get('type','')
+            subtype = data.get('subtype','')
+            manufacturer = data.get('manufacturer','')
+            model = data.get('model','')
+            building = data.get('building','')
+            location = data.get('location','')
+            consignee = data.get('consignee','')
+
+
+            list_items = Devices.objects.filter(asset__icontains = asset,
+                                                asset_old__icontains = asset_old,
+                                                manufacturer__icontains = manufacturer,
+                                                model__icontains = model,
+                                                otheremq__building__icontains = building,
+                                                otheremq__location__icontains = location,
+                                                otheremq__consignee__icontains = consignee,
+                                                )
+
+            if status:
+                list_items = list_items.filter(status=status)
+            if  type:
+                list_items = list_items.filter(type=type)
+            if subtype:
+                list_items = list_items.filter(subtype=subtype)
+
+
+            count = list_items.count()
+            paginator = Paginator(list_items ,15)
+
+            try:
+                page = int(request.GET.get('page', '1'))
+            except ValueError:
+                page = 1
+            try:
+                list_items = paginator.page(page)
+            except :
+                list_items = paginator.page(paginator.num_pages)
+    else:
+        searchform = OtherEmqSearch()
+
+    return render(request, "assets/otheremq_search.html", locals())
