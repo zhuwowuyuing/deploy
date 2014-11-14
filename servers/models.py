@@ -17,6 +17,8 @@ class BaseInfo(models.Model):
     os                  = models.CharField('操作系统',max_length=150)
     productname         = models.CharField('服务器型号', max_length=100, null=True)
     manufacturer        = models.CharField('品牌', max_length=100, null=True)
+    idc                 = models.CharField('IDC', max_length=100, null=True)
+    ingw                = models.CharField('网关', max_length=100, null=True)
 
     def __unicode__(self):
         return u'%s' % (self.hostname)
@@ -42,7 +44,7 @@ class NetworkInfo(models.Model):
         ordering = ['hostname', 'interface']
 
     hostname            = models.ForeignKey(BaseInfo,related_name="interfaces")
-    interface           = models.CharField('网络接口', max_length=60)
+    interface           = models.CharField('网络接口', max_length=200)
     hwaddr              = models.CharField('物理地址', max_length=60)
     ipaddr              = models.CharField('IP地址', max_length=60)
 
