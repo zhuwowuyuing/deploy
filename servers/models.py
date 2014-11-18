@@ -17,6 +17,8 @@ class BaseInfo(models.Model):
     os                  = models.CharField('操作系统',max_length=150)
     productname         = models.CharField('服务器型号', max_length=100, null=True)
     manufacturer        = models.CharField('品牌', max_length=100, null=True)
+    idc                 = models.CharField('IDC', max_length=100, null=True)
+    ingw                = models.CharField('网关', max_length=100, null=True)
 
     def __unicode__(self):
         return u'%s' % (self.hostname)
@@ -42,7 +44,7 @@ class NetworkInfo(models.Model):
         ordering = ['hostname', 'interface']
 
     hostname            = models.ForeignKey(BaseInfo,related_name="interfaces")
-    interface           = models.CharField('网络接口', max_length=60)
+    interface           = models.CharField('网络接口', max_length=400)
     hwaddr              = models.CharField('物理地址', max_length=60)
     ipaddr              = models.CharField('IP地址', max_length=60)
 
@@ -56,6 +58,17 @@ class ErrorInfo(models.Model):
 
     hostname            = models.CharField('主机名',max_length=60)
     info                = models.CharField('信息', max_length=200)
+
+    def __unicode__(self):
+        return u'%s' % (self.hostname)
+
+class CheckError(models.Model):
+    class Meta:
+        verbose_name = '检测脚本错误信息'
+        verbose_name_plural = verbose_name
+    time                = models.DateTimeField("故障时间")
+    hostname            = models.CharField('主机名',max_length=60)
+    errormsg            = models.CharField('错误信息', max_length=1000)
 
     def __unicode__(self):
         return u'%s' % (self.hostname)
