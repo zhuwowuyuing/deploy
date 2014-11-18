@@ -24,6 +24,7 @@
                         <tr><td><strong>操作系统：</strong></td><td>{{ machine_instance.os }}</td></tr>
                         <tr><td><strong>型号：</strong></td><td>{{ machine_instance.productname }}</td></tr>
                         <tr><td><strong>品牌：</strong></td><td>{{ machine_instance.manufacturer }}</td></tr>
+                        <tr><td><strong>IDC：</strong></td><td>{{ machine_instance.idc }}</td></tr>
                         {% for disk in machine_instance.disks.all %}
                             <tr><td><strong>磁盘{{ disk.mount }}:</strong></td><td>{{ disk.available | diskmeasure }}/{{ disk.total | diskmeasure}} </td></tr>
                         {% endfor %}
@@ -31,6 +32,7 @@
                             <tr><td><strong>{{ network.interface }} IP地址：</strong></td><td>{{ network.ipaddr }}</td></tr>
                             <tr><td><strong>{{ network.interface }} MAC地址：</strong></td><td>{{ network.hwaddr }}</td></tr>
                         {% endfor %}
+                        <tr><td><strong>Gateway：</strong></td><td>{{ machine_instance.ingw }}</td></tr>
                     </table>
                 {% else %}
                     <div align="center">

@@ -84,8 +84,7 @@ def server_list(request):
 # 服务器详细信息
 def server_view(request, hostname):
     page_title='服务器详情'
-    # machine_list = BaseInfo.objects.filter(hostname=hostname)
-    # machine_instance =  machine_list[0] if machine_list else ''
+
     machine_instance = BaseInfo.objects.get(hostname=hostname)
 
     # asset info

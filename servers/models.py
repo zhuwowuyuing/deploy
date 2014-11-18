@@ -44,7 +44,7 @@ class NetworkInfo(models.Model):
         ordering = ['hostname', 'interface']
 
     hostname            = models.ForeignKey(BaseInfo,related_name="interfaces")
-    interface           = models.CharField('网络接口', max_length=200)
+    interface           = models.CharField('网络接口', max_length=400)
     hwaddr              = models.CharField('物理地址', max_length=60)
     ipaddr              = models.CharField('IP地址', max_length=60)
 
