@@ -200,11 +200,11 @@ def server_edit(request, asset):
         maninfo.save()
 
     if device_change_fields:
-        modinfo(type, asset, device_change_fields , old_device_instance, Devices.objects.get(asset =asset), request.user)
+        modinfo(typename, asset, device_change_fields , old_device_instance, Devices.objects.get(asset =asset), request.user)
     if server_change_fields:
-        modinfo(type, asset, server_change_fields , old_server_instance, Server.objects.get(asset =asset), request.user)
+        modinfo(typename, asset, server_change_fields , old_server_instance, Server.objects.get(asset =asset), request.user)
     if maninfo_change_fields:
-        modinfo(type, asset, maninfo_change_fields , old_maninfo_instance, ManInfo.objects.get(asset =asset), request.user)
+        modinfo(typename, asset, maninfo_change_fields , old_maninfo_instance, ManInfo.objects.get(asset =asset), request.user)
 
     try:
         machine_instance = BaseInfo.objects.get(hostname=Server.objects.get(asset=asset).hostname)
