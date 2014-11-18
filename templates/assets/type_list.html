@@ -1,0 +1,21 @@
+
+{% extends "base.html" %}
+
+{#{% block title %} <h1> Status </h1><h2> List </h2> {% endblock %}#}
+{##}
+{#{% block heading %}#}
+{#    <h1> Status</h1>#}
+{#    <h2> List Records</h2>#}
+{#{% endblock %}#}
+
+{% block content %}
+    <div class="row-fluid">
+        <div class="block">
+            <p class="block-heading">{{ page_title }}</p>
+            <div class="block-body">
+                {% load render_table from django_tables2 %}
+                {% render_table list_items %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

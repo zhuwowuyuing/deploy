@@ -8,35 +8,127 @@
     <div class="well">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#home" data-toggle="tab">服务器详情</a></li>
-            <li><a href="#man_info" data-toggle="tab">管理信息</a></li>
+            <li><a href="#asset_info" data-toggle="tab">资产信息</a></li>
         </ul>
 
         <div id="server_view" class="tab-content">
             <div class="tab-pane active in" id="home">
-                {% load measure %}
-                <table class="table table-bordered ">
-                    <tr><td><strong>主机名：</strong></td></td><td>{{ machine_instance.hostname }}</td></tr>
-                    <tr><td><strong>状态：</strong></td><td>{{ machine_instance.status }}</td></tr>
-                    <tr><td><strong>CPU型号：</strong></td><td>{{ machine_instance.cpu_model }}</td></tr>
-                    <tr><td><strong>CPU核数：</strong></td><td>{{ machine_instance.num_cpus }}</td></tr>
-                    <tr><td><strong>内存：</strong></td><td>{{ machine_instance.mem_total | memmeasure }}</td></tr>
-                    <tr><td><strong>操作系统：</strong></td><td>{{ machine_instance.os }}</td></tr>
-                    <tr><td><strong>型号：</strong></td><td>{{ machine_instance.productname }}</td></tr>
-                    <tr><td><strong>品牌：</strong></td><td>{{ machine_instance.manufacturer }}</td></tr>
-                    {% for disk in machine_instance.disks.all %}
-                        <tr><td><strong>磁盘{{ disk.mount }}:</strong></td><td>{{ disk.available | diskmeasure }}/{{ disk.total | diskmeasure}} </td></tr>
-                    {% endfor %}
-                    {% for network in machine_instance.interfaces.all %}
-                        <tr><td><strong>{{ network.interface }} IP地址：</strong></td><td>{{ network.ipaddr }}</td></tr>
-                        <tr><td><strong>{{ network.interface }} MAC地址：</strong></td><td>{{ network.hwaddr }}</td></tr>
-                    {% endfor %}
-                </table>
+                {% if machine_instance %}
+                    {% load measure %}
+                    <table class="table table-bordered ">
+                        <tr><td><strong>主机名：</strong></td></td><td>{{ machine_instance.hostname }}</td></tr>
+                        <tr><td><strong>状态：</strong></td><td>{{ machine_instance.status }}</td></tr>
+                        <tr><td><strong>CPU型号：</strong></td><td>{{ machine_instance.cpu_model }}</td></tr>
+                        <tr><td><strong>CPU核数：</strong></td><td>{{ machine_instance.num_cpus }}</td></tr>
+                        <tr><td><strong>内存：</strong></td><td>{{ machine_instance.mem_total | memmeasure }}</td></tr>
+                        <tr><td><strong>操作系统：</strong></td><td>{{ machine_instance.os }}</td></tr>
+                        <tr><td><strong>型号：</strong></td><td>{{ machine_instance.productname }}</td></tr>
+                        <tr><td><strong>品牌：</strong></td><td>{{ machine_instance.manufacturer }}</td></tr>
+                        <tr><td><strong>IDC：</strong></td><td>{{ machine_instance.idc }}</td></tr>
+                        {% for disk in machine_instance.disks.all %}
+                            <tr><td><strong>磁盘{{ disk.mount }}:</strong></td><td>{{ disk.available | diskmeasure }}/{{ disk.total | diskmeasure}} </td></tr>
+                        {% endfor %}
+                        {% for network in machine_instance.interfaces.all %}
+                            <tr><td><strong>{{ network.interface }} IP地址：</strong></td><td>{{ network.ipaddr }}</td></tr>
+                            <tr><td><strong>{{ network.interface }} MAC地址：</strong></td><td>{{ network.hwaddr }}</td></tr>
+                        {% endfor %}
+                        <tr><td><strong>Gateway：</strong></td><td>{{ machine_instance.ingw }}</td></tr>
+                    </table>
+                {% else %}
+                    <div align="center">
+                        <strong>没有该服务器信息</strong>
+                    </div>
+                {% endif %}
             </div>
 
-            <div class="tab-pane fade" id="man_info">
+            <div class="tab-pane fade" id="asset_info">
+                {% if server_instance %}
+                    <table class="table">
+                        <tr>
+                            <td>{{ device_form.asset.label}}</td><td>{{device_form.asset}}</td>
+                            <td>{{ device_form.asset_old.label }}</td><td>{{device_form.asset_old}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ device_form.district.label }}</td><td>{{device_form.district}}</td>
+                            <td>{{ device_form.company.label }}</td><td>{{device_form.company}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ device_form.type.label }}</td><td>{{ device_form.type}}</td>
+                            <td>{{ device_form.subtype.label }}</td><td>{{ device_form.subtype}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ device_form.status.label }}</td><td>{{device_form.status}}</td>
+                            <td>{{ device_form.manufacturer.label }}</td><td>{{device_form.manufacturer}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ device_form.model.label }}</td><td>{{ device_form.model}}</td>
+                            <td>{{ device_form.serialno.label }}</td><td>{{ device_form.serialno}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ server_form.size.label }}</td><td>{{ server_form.size}}</td>
+                            <td>{{ server_form.cpu.label }}</td><td>{{ server_form.cpu}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ server_form.harddisk.label }}</td><td>{{ server_form.harddisk }}</td>
+                            <td>{{ server_form.ram.label }}</td><td>{{ server_form.ram}}</td>
 
-                <table class="table table-bordered">
-                </table>
+                        </tr>
+                        <tr>
+                            <td>{{ server_form.os.label }}</td><td>{{ server_form.os}}</td>
+                            <td>{{ server_form.building.label }}</td><td>{{ server_form.building}}</td>
+
+                        </tr>
+                        <tr>
+                            <td>{{ server_form.location.label }}</td><td>{{ server_form.location}}</td>
+                            <td>{{ server_form.consignee.label }}</td><td>{{ server_form.consignee}}</td>
+
+                        </tr>
+                        <tr>
+                            <td>{{ server_form.hostname.label }}</td><td>{{ server_form.hostname}}</td>
+                            <td>{{ server_form.dept.label }}</td><td>{{ server_form.dept}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ server_form.business.label }}</td><td>{{ server_form.business}}</td>
+                            <td>{{ server_form.ownername.label }}</td><td>{{ server_form.ownername}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ maninfo_form.administrator.label }}</td><td>{{ maninfo_form.administrator }}</td>
+                            <td>{{ maninfo_form.warehousedate.label }}</td><td>{{ maninfo_form.warehousedate }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ maninfo_form.receivedate.label }}</td><td>{{ maninfo_form.receivedate }}</td>
+                            <td>{{ maninfo_form.warrantyexpirationdate.label }}</td><td>{{ maninfo_form.warrantyexpirationdate }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ maninfo_form.scrapDate.label }}</td><td>{{ maninfo_form.scrapDate }}</td>
+                            <td>{{ maninfo_form.purchase_date.label }}</td><td>{{ maninfo_form.purchase_date }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ maninfo_form.accounting_date.label }}</td><td>{{ maninfo_form.accounting_date }}</td>
+                            <td>{{ maninfo_form.purchase_cost.label }}</td><td>{{ maninfo_form.purchase_cost }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ maninfo_form.account_cost.label }}</td><td>{{ maninfo_form.account_cost }}</td>
+                            <td>{{ maninfo_form.vendor.label }}</td><td>{{ maninfo_form.vendor }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ maninfo_form.vendor_contacts.label }}</td><td>{{ maninfo_form.vendor_contacts }}</td>
+                            <td>{{ maninfo_form.accounting_info.label }}</td><td>{{ maninfo_form.accounting_info }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ maninfo_form.order_list.label }}</td><td>{{ maninfo_form.order_list }}</td>
+                            <td>{{ device_form.changeInfo.label }}</td><td>{{ device_form.changeInfo }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ device_form.comment.label }}</td><td>{{ device_form.comment }}</td>
+                            <td></td><td></td>
+                        </tr>
+                    </table>
+                {% else %}
+                    <div align="center">
+                        <strong>没有相关信息</strong>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

@@ -1,0 +1,23 @@
+
+{% extends "base.html" %}
+
+{#{% block title %} Servers - Create {% endblock %}#}
+{##}
+{#{% block heading %}<h1>  Servers - Create </h1>  {% endblock %}#}
+
+{% block content %}
+    <div class="row-fluid">
+        <div class="block">
+            <div class="block-body">
+                <table>
+                    <form action="" method="POST"> {% csrf_token %}
+                        {{form}}
+                        <tr>
+                            <td colspan="2" align="right"><input type="submit" value="Create"/></td>
+                        </tr>
+                    </form>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
