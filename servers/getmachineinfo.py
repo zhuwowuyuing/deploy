@@ -6,8 +6,8 @@ import MySQLdb
 import types
 
 # connect database
-host="192.168.0.118"
-port=3306
+host="192.168.1.31"
+port=3759
 user="deploy"
 password="deploy"
 db="deploy"
@@ -136,10 +136,16 @@ def update_network(hostname, items, cursor, machine_exist):
             sql = "update servers_networkinfo set hwaddr=%s,  ipaddr=%s where hostname_id=%s and interface=%s"
             cursor.execute(sql, (hwaddr, ipaddr, hostname,interface))
 
+def clear_error(cursor):
+    sql = "TRUNCATE TABLE servers_errorinfo"
+    cursor.execute(sql)
+
+
 if __name__ == '__main__':
     conn=MySQLdb.connect(host=host, port=port, user=user, passwd=password, db=db)
     conn.autocommit(1)
     cursor = conn.cursor()
+    clear_error(cursor)
     machine_info = get_info()
     update_info(machine_info, cursor)
     conn.commit()
