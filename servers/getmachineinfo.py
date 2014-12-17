@@ -18,9 +18,9 @@ def get_info():
     client = salt.client.LocalClient(opts['conf_file'])
     grains_items_args = ['cpu_model', 'osfullname', 'osrelease', 'osarch', 'kernelrelease', \
                          'num_cpus', 'manufacturer', 'mem_total', 'productname', 'idc', 'ingw']
-    disk_args = ['ext?']
+    # disk_args = ['ext?']
 
-    result = client.cmd('*', ['grains.item', 'status.diskusage', 'network.interfaces', 'test.ping'], [grains_items_args, disk_args, [], []],\
+    result = client.cmd('*', ['grains.item', 'disk.usage', 'network.interfaces', 'test.ping'], [grains_items_args, [], [], []],\
                         timeout=opts['timeout'])
 
     return result
@@ -37,7 +37,7 @@ def update_info(manchine_info, cursor):
     for (hostname, info) in manchine_info.items():
         grains = info.get('grains.item', '')
         network = info.get('network.interfaces', '')
-        disk = info.get('status.diskusage', '')
+        disk = info.get('disk.usage', '')
         status = info.get('test.ping', False)
 
         if grains:
@@ -93,13 +93,15 @@ def update_disk(hostname, items, cursor, machine_exist):
         return
 
     for (mount, info) in items.items():
-        available	= info.get('available', 0)
-        total		= info.get('total', 0)
-        lines       = cursor.execute("select hostname_id, mount from servers_diskinfo where hostname_id=%s and mount=%s", \
-                                 (hostname,mount,))
+        if mount == "/dev/shm":
+            continue
+
+        available	= info.get('available', 0) if info.get('available', 0) else 0
+        total		= info.get('1K-blocks', 0) if info.get('1K-blocks', 0) else 0
 
         lines       = cursor.execute("select hostname_id, mount from servers_diskinfo where hostname_id=%s and mount=%s", \
                                      (hostname,mount,))
+        #print "hostname: %s, mount: %s, available: %s, total: %s"%(hostname, mount, available, total)
         if lines == 0:
             sql = "INSERT into servers_diskinfo(hostname_id, mount, available, total) VALUES(%s,%s,%s,%s)"
             cursor.execute(sql, (hostname, mount, available, total))
@@ -136,16 +138,11 @@ def update_network(hostname, items, cursor, machine_exist):
             sql = "update servers_networkinfo set hwaddr=%s,  ipaddr=%s where hostname_id=%s and interface=%s"
             cursor.execute(sql, (hwaddr, ipaddr, hostname,interface))
 
-def clear_error(cursor):
-    sql = "TRUNCATE TABLE servers_errorinfo"
-    cursor.execute(sql)
-
-
 if __name__ == '__main__':
     conn=MySQLdb.connect(host=host, port=port, user=user, passwd=password, db=db)
     conn.autocommit(1)
     cursor = conn.cursor()
-    clear_error(cursor)
+    cursor.execute("TRUNCATE TABLE servers_errorinfo")
     machine_info = get_info()
     update_info(machine_info, cursor)
     conn.commit()
