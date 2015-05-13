@@ -92,22 +92,29 @@ def update_disk(hostname, items, cursor, machine_exist):
         cursor.execute("INSERT INTO servers_errorinfo(hostname, info) VALUE(%s, %s)", (hostname, "Can not get disk data"))
         return
 
+    del_sql = "delete from servers_diskinfo where hostname_id=%s"
+    cursor.execute(del_sql, (hostname,))
+
+    values = []
     for (mount, info) in items.items():
         if mount == "/dev/shm":
             continue
 
         available	= info.get('available', 0) if info.get('available', 0) else 0
         total		= info.get('1K-blocks', 0) if info.get('1K-blocks', 0) else 0
-
-        lines       = cursor.execute("select hostname_id, mount from servers_diskinfo where hostname_id=%s and mount=%s", \
-                                     (hostname,mount,))
-        #print "hostname: %s, mount: %s, available: %s, total: %s"%(hostname, mount, available, total)
-        if lines == 0:
-            sql = "INSERT into servers_diskinfo(hostname_id, mount, available, total) VALUES(%s,%s,%s,%s)"
-            cursor.execute(sql, (hostname, mount, available, total))
-        elif lines == 1:
-            sql = "update servers_diskinfo set available=%s,  total=%s where hostname_id=%s and mount=%s"
-            cursor.execute(sql, (available, total,hostname,mount))
+        values.append((available, total, hostname,mount))
+        # lines       = cursor.execute("select hostname_id, mount from servers_diskinfo where hostname_id=%s and mount=%s", \
+        #                              (hostname,mount,))
+        # #print "hostname: %s, mount: %s, available: %s, total: %s"%(hostname, mount, available, total)
+        # if lines == 0:
+        #     sql = "INSERT into servers_diskinfo(hostname_id, mount, available, total) VALUES(%s,%s,%s,%s)"
+        #     cursor.execute(sql, (hostname, mount, available, total))
+        # elif lines == 1:
+        #     sql = "update servers_diskinfo set available=%s,  total=%s where hostname_id=%s and mount=%s"
+        #     cursor.execute(sql, (available, total,hostname,mount))
+    if len(values) > 0 :
+        sql = "INSERT into servers_diskinfo(hostname_id, mount, available, total) VALUES(%s,%s,%s,%s)"
+        cursor.execute(sql, values)
 
 # update network data
 def update_network(hostname, items, cursor, machine_exist):
@@ -122,6 +129,10 @@ def update_network(hostname, items, cursor, machine_exist):
         cursor.execute(sql, (hostname, errmsg))
         return
 
+    del_sql = "delete from servers_networkinfo where hostname_id=%s"
+    cursor.execute(del_sql, (hostname,))
+
+    values = []
     for (interface, info) in items.items():
         if not info.has_key('inet') or not cmp(interface, 'lo'):
             continue
@@ -129,17 +140,14 @@ def update_network(hostname, items, cursor, machine_exist):
         hwaddr =	info.get('hwaddr', '')
         ipaddr =	((info['inet'])[0])['address']
 
-        lines       = cursor.execute("select hostname_id, interface from servers_networkinfo where hostname_id=%s and interface=%s", \
-                                 (hostname, interface,))
-        if lines == 0:
-            sql = "INSERT into servers_networkinfo(hostname_id, interface, hwaddr, ipaddr) VALUES(%s,%s,%s,%s)"
-            cursor.execute(sql, (hostname, interface, hwaddr, ipaddr))
-        elif lines == 1:
-            sql = "update servers_networkinfo set hwaddr=%s,  ipaddr=%s where hostname_id=%s and interface=%s"
-            cursor.execute(sql, (hwaddr, ipaddr, hostname,interface))
+        values.append((hostname, interface, hwaddr, ipaddr))
+
+    if len(values) > 0 :
+        sql = "INSERT into servers_networkinfo(hostname_id, interface, hwaddr, ipaddr) VALUES(%s,%s,%s,%s)"
+        cursor.executemany(sql, values)
 
 if __name__ == '__main__':
-    conn=MySQLdb.connect(host=host, port=port, user=user, passwd=password, db=db)
+    conn=MySQLdb.connect(host=host, port=port, user=user, passwd=password, db=db, charset='utf8')
     conn.autocommit(1)
     cursor = conn.cursor()
     cursor.execute("TRUNCATE TABLE servers_errorinfo")

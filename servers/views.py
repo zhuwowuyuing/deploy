@@ -17,6 +17,8 @@ from salt import runner
 import salt
 from assets.models import *
 from assets.forms import *
+from django.http import HttpResponse
+import json
 
 
 def index(request):
@@ -161,3 +163,11 @@ def server_checkerror(request):
 
 def index(request):
     return render(request, 'index.html', locals())
+
+def server_query(request):
+    machine_list = []
+    if request.method == 'GET' and 'hostname' in request.GET:
+        hostname = request.GET['hostname']
+        machine_list = BaseInfo.objects.filter(hostname__icontains=hostname).values("hostname")
+
+    return HttpResponse(json.dumps(list(machine_list), ensure_ascii=False))

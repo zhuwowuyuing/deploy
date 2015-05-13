@@ -9,4 +9,5 @@ urlpatterns = patterns('',
     url(r'errors/', 'servers.views.server_errors'),
     url(r'offline/', 'servers.views.server_offline'),
     url(r'checkerror/', 'servers.views.server_checkerror'),
+    url(r'query', 'servers.views.server_query'),
 )
