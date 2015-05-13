@@ -170,4 +170,4 @@ def server_query(request):
         hostname = request.GET['hostname']
         machine_list = BaseInfo.objects.filter(hostname__icontains=hostname).values("hostname")
 
-    return HttpResponse(json.dumps(list(machine_list), ensure_ascii=False))
+    return HttpResponse(json.dumps(list(machine_list), ensure_ascii=False, sort_keys=True, indent=4),content_type="application/json")
