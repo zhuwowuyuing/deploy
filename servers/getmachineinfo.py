@@ -34,11 +34,12 @@ def is_exist(cursor, hostname):
         return 0
 
 def update_info(manchine_info, cursor):
+    cursor.execute("update servers_baseinfo set status='False'")
     for (hostname, info) in manchine_info.items():
         grains = info.get('grains.item', '')
         network = info.get('network.interfaces', '')
         disk = info.get('disk.usage', '')
-        status = info.get('test.ping', False)
+        status = info.get('test.ping', 'False')
 
         if grains:
             update_baseinfo(hostname, grains, status, cursor)
@@ -102,7 +103,7 @@ def update_disk(hostname, items, cursor, machine_exist):
 
         available	= info.get('available', 0) if info.get('available', 0) else 0
         total		= info.get('1K-blocks', 0) if info.get('1K-blocks', 0) else 0
-        values.append((available, total, hostname,mount))
+        values.append((hostname, mount, available, total))
         # lines       = cursor.execute("select hostname_id, mount from servers_diskinfo where hostname_id=%s and mount=%s", \
         #                              (hostname,mount,))
         # #print "hostname: %s, mount: %s, available: %s, total: %s"%(hostname, mount, available, total)
@@ -114,7 +115,7 @@ def update_disk(hostname, items, cursor, machine_exist):
         #     cursor.execute(sql, (available, total,hostname,mount))
     if len(values) > 0 :
         sql = "INSERT into servers_diskinfo(hostname_id, mount, available, total) VALUES(%s,%s,%s,%s)"
-        cursor.execute(sql, values)
+        cursor.executemany(sql, values)
 
 # update network data
 def update_network(hostname, items, cursor, machine_exist):

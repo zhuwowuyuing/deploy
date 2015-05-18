@@ -19,6 +19,7 @@ from assets.models import *
 from assets.forms import *
 from django.http import HttpResponse
 import json
+from django.db.models import Q
 
 
 def index(request):
@@ -166,8 +167,18 @@ def index(request):
 
 def server_query(request):
     machine_list = []
-    if request.method == 'GET' and 'hostname' in request.GET:
+    if request.method == 'GET' and 'hostname' in request.GET and 'ipaddr' in request.GET and 'idc' in request.GET:
         hostname = request.GET['hostname']
-        machine_list = BaseInfo.objects.filter(hostname__icontains=hostname).values("hostname")
+        ipaddr = request.GET['ipaddr']
+        idc = request.GET['idc']
+
+        #machine_list = BaseInfo.objects.filter((Q(interfaces__ipaddr__icontains="192.168.") & ~Q(interfaces__ipaddr__icontains="192.168.9") & ~Q(interfaces__ipaddr__icontains="192.168.10")  & ~Q(interfaces__ipaddr__icontains="192.168.13") & ~Q(interfaces__ipaddr__icontains="192.168.191") & ~Q(interfaces__ipaddr__icontains="192.168.122")) | Q(interfaces__ipaddr__icontains="10.10.")).values('hostname', 'interfaces__ipaddr', 'idc').order_by('interfaces__ipaddr')
+        #machine_list = BaseInfo.objects.filter(hostname__icontains=hostname, idc__icontains=idc, interfaces__ipaddr__icontains=ipaddr).exclude(Q(interfaces__ipaddr__icontains="192.168.9") | Q(interfaces__ipaddr__icontains="192.168.10")  | Q(interfaces__ipaddr__icontains="192.168.13") | Q(interfaces__ipaddr__icontains="192.168.191") | Q(interfaces__ipaddr__icontains="192.168.122")).values('hostname', 'interfaces__ipaddr', 'idc').order_by('interfaces__ipaddr')
+        machine_list = BaseInfo.objects.filter( Q(hostname__icontains=hostname) & Q(idc__icontains=idc) & Q(interfaces__ipaddr__icontains=ipaddr)
+                                                & (( Q(interfaces__ipaddr__icontains="192.168.") & ~Q(interfaces__ipaddr__icontains="192.168.9")
+                                                   & ~Q(interfaces__ipaddr__icontains="192.168.10")  & 	~Q(interfaces__ipaddr__icontains="192.168.13")
+                                                     & ~Q(interfaces__ipaddr__icontains="192.168.191") & ~Q(interfaces__ipaddr__icontains="192.168.122"))
+                                                | Q(interfaces__ipaddr__icontains="10.10."))).values('hostname', 'interfaces__ipaddr', 'idc').order_by('interfaces__ipaddr')
 
     return HttpResponse("jsoncallback("+json.dumps(list(machine_list), ensure_ascii=False, sort_keys=True, indent=4)+")",content_type="application/json")
+
