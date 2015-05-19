@@ -172,7 +172,7 @@ def server_query(request):
         ipaddr = request.GET['ipaddr']
         idc = request.GET['idc']
 
-        machine_list = NetworkInfo.objects.filter(Q(hostname__hostname__icontains=hostname) & Q(hostname__idc__icontains=idc) & Q(ipaddr__icontains=ipaddr) & ((Q(ipaddr__icontains="192.168.") & ~Q(ipaddr__icontains="192.168.9") & ~Q(ipaddr__icontains="192.168.10")  & ~Q(ipaddr__icontains="192.168.13") & ~Q(ipaddr__icontains="192.168.191") & ~Q(ipaddr__icontains="192.168.122")) | Q(ipaddr__icontains="10.10."))).values("hostname__hostname", "ipaddr", "hostname__idc")
+        machine_list = NetworkInfo.objects.filter(Q(hostname__hostname__icontains=hostname) & Q(hostname__idc__icontains=idc) & Q(ipaddr__icontains=ipaddr) & ((Q(ipaddr__icontains="192.168.") & ~Q(ipaddr__icontains="192.168.9.") & ~Q(ipaddr__icontains="192.168.10.")  & ~Q(ipaddr__icontains="192.168.13.") & ~Q(ipaddr__icontains="192.168.191.") & ~Q(ipaddr__icontains="192.168.122.") & ~Q(ipaddr__icontains="192.168.199.")) | Q(ipaddr__icontains="10.10."))).values("hostname__hostname", "ipaddr", "hostname__idc")
 
     return HttpResponse("jsoncallback("+json.dumps(list(machine_list), ensure_ascii=False, sort_keys=True, indent=4)+")",content_type="application/json")
 
