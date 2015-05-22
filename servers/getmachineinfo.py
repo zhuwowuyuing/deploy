@@ -4,7 +4,7 @@ import salt.config
 import salt.client
 import MySQLdb
 import types
-
+import re
 # connect database
 host="192.168.1.31"
 port=3759
@@ -18,7 +18,6 @@ def get_info():
     client = salt.client.LocalClient(opts['conf_file'])
     grains_items_args = ['cpu_model', 'osfullname', 'osrelease', 'osarch', 'kernelrelease', \
                          'num_cpus', 'manufacturer', 'mem_total', 'productname', 'idc', 'ingw']
-    # disk_args = ['ext?']
 
     result = client.cmd('*', ['grains.item', 'disk.usage', 'network.interfaces', 'test.ping'], [grains_items_args, [], [], []],\
                         timeout=opts['timeout'])
@@ -104,15 +103,7 @@ def update_disk(hostname, items, cursor, machine_exist):
         available	= info.get('available', 0) if info.get('available', 0) else 0
         total		= info.get('1K-blocks', 0) if info.get('1K-blocks', 0) else 0
         values.append((hostname, mount, available, total))
-        # lines       = cursor.execute("select hostname_id, mount from servers_diskinfo where hostname_id=%s and mount=%s", \
-        #                              (hostname,mount,))
-        # #print "hostname: %s, mount: %s, available: %s, total: %s"%(hostname, mount, available, total)
-        # if lines == 0:
-        #     sql = "INSERT into servers_diskinfo(hostname_id, mount, available, total) VALUES(%s,%s,%s,%s)"
-        #     cursor.execute(sql, (hostname, mount, available, total))
-        # elif lines == 1:
-        #     sql = "update servers_diskinfo set available=%s,  total=%s where hostname_id=%s and mount=%s"
-        #     cursor.execute(sql, (available, total,hostname,mount))
+
     if len(values) > 0 :
         sql = "INSERT into servers_diskinfo(hostname_id, mount, available, total) VALUES(%s,%s,%s,%s)"
         cursor.executemany(sql, values)
@@ -135,13 +126,11 @@ def update_network(hostname, items, cursor, machine_exist):
 
     values = []
     for (interface, info) in items.items():
-        if not info.has_key('inet') or not cmp(interface, 'lo'):
-            continue
-
-        hwaddr =	info.get('hwaddr', '')
-        ipaddr =	((info['inet'])[0])['address']
-
-        values.append((hostname, interface, hwaddr, ipaddr))
+        # print hostname
+        if info.has_key('inet') and info.has_key('hwaddr') and cmp(interface, 'lo')<>0 and info['up'] and re.match(r'[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}', info['hwaddr']):
+            hwaddr =info.get('hwaddr', 'null')
+            ipaddr = ((info['inet'])[0])['address']
+            values.append((hostname, interface, hwaddr, ipaddr))
 
     if len(values) > 0 :
         sql = "INSERT into servers_networkinfo(hostname_id, interface, hwaddr, ipaddr) VALUES(%s,%s,%s,%s)"
