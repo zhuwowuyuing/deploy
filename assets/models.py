@@ -93,7 +93,7 @@ class ManInfo(models.Model):
     receivedate     = models.DateField('领用时间', blank=True, null=True)
     warrantyexpirationdate = models.DateField('保修至', blank=True, null=True)
     scrapDate       = models.DateField('报废时间', blank=True, null=True)
-    purchase_date   = models.DateField('采购时间', blank=True)
+    purchase_date   = models.DateField('采购时间', blank=True, null=True)
     purchase_cost   = models.FloatField('采购价格',max_length=60, blank=True)
     accounting_date = models.DateField('入账时间', blank=True,null=True)
     account_cost    = models.FloatField('入账价格',max_length=60, blank=True)

@@ -1,7 +1,5 @@
 __author__ = 'liangnaihua'
 
-__author__ = 'liangnaihua'
-
 # tutorial/tables.py
 import django_tables2 as tables
 from models import CheckError

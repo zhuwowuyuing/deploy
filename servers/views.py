@@ -17,6 +17,9 @@ from salt import runner
 import salt
 from assets.models import *
 from assets.forms import *
+from django.http import HttpResponse
+import json
+from django.db.models import Q
 
 
 def index(request):
@@ -161,3 +164,15 @@ def server_checkerror(request):
 
 def index(request):
     return render(request, 'index.html', locals())
+
+def server_query(request):
+    machine_list = []
+    if request.method == 'GET' and 'hostname' in request.GET and 'ipaddr' in request.GET and 'idc' in request.GET:
+        hostname = request.GET['hostname']
+        ipaddr = request.GET['ipaddr']
+        idc = request.GET['idc']
+
+        machine_list = NetworkInfo.objects.filter(Q(hostname__hostname__icontains=hostname) & Q(hostname__idc__icontains=idc) & Q(ipaddr__icontains=ipaddr) & ((Q(ipaddr__icontains="192.168.") & ~Q(ipaddr__icontains="192.168.9.") & ~Q(ipaddr__icontains="192.168.10.")  & ~Q(ipaddr__icontains="192.168.13.") & ~Q(ipaddr__icontains="192.168.191.") & ~Q(ipaddr__icontains="192.168.122.") & ~Q(ipaddr__icontains="192.168.199.")) | Q(ipaddr__icontains="10.10."))).values("hostname__hostname", "ipaddr", "hostname__idc")
+
+    return HttpResponse("jsoncallback("+json.dumps(list(machine_list), ensure_ascii=False, sort_keys=True, indent=4)+")",content_type="application/json")
+

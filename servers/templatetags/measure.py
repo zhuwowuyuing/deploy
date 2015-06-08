@@ -6,7 +6,7 @@ register = template.Library()
 
 @register.filter
 def diskmeasure(value):
-    ret_mb = float(value)/1024/1024
+    ret_mb = float(value)/1024
     if ret_mb < 1:
         return "%.2f MB"%(ret_mb)
     elif ret_mb > 1 and ret_mb < 1024:

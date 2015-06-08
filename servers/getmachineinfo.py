@@ -4,10 +4,10 @@ import salt.config
 import salt.client
 import MySQLdb
 import types
-
+import re
 # connect database
-host="192.168.0.118"
-port=3306
+host="192.168.1.31"
+port=3759
 user="deploy"
 password="deploy"
 db="deploy"
@@ -18,9 +18,8 @@ def get_info():
     client = salt.client.LocalClient(opts['conf_file'])
     grains_items_args = ['cpu_model', 'osfullname', 'osrelease', 'osarch', 'kernelrelease', \
                          'num_cpus', 'manufacturer', 'mem_total', 'productname', 'idc', 'ingw']
-    disk_args = ['ext?']
 
-    result = client.cmd('*', ['grains.item', 'status.diskusage', 'network.interfaces', 'test.ping'], [grains_items_args, disk_args, [], []],\
+    result = client.cmd('*', ['grains.item', 'disk.usage', 'network.interfaces', 'test.ping'], [grains_items_args, [], [], []],\
                         timeout=opts['timeout'])
 
     return result
@@ -34,11 +33,12 @@ def is_exist(cursor, hostname):
         return 0
 
 def update_info(manchine_info, cursor):
+    cursor.execute("update servers_baseinfo set status='False'")
     for (hostname, info) in manchine_info.items():
         grains = info.get('grains.item', '')
         network = info.get('network.interfaces', '')
-        disk = info.get('status.diskusage', '')
-        status = info.get('test.ping', False)
+        disk = info.get('disk.usage', '')
+        status = info.get('test.ping', 'False')
 
         if grains:
             update_baseinfo(hostname, grains, status, cursor)
@@ -92,20 +92,21 @@ def update_disk(hostname, items, cursor, machine_exist):
         cursor.execute("INSERT INTO servers_errorinfo(hostname, info) VALUE(%s, %s)", (hostname, "Can not get disk data"))
         return
 
-    for (mount, info) in items.items():
-        available	= info.get('available', 0)
-        total		= info.get('total', 0)
-        lines       = cursor.execute("select hostname_id, mount from servers_diskinfo where hostname_id=%s and mount=%s", \
-                                 (hostname,mount,))
+    del_sql = "delete from servers_diskinfo where hostname_id=%s"
+    cursor.execute(del_sql, (hostname,))
 
-        lines       = cursor.execute("select hostname_id, mount from servers_diskinfo where hostname_id=%s and mount=%s", \
-                                     (hostname,mount,))
-        if lines == 0:
-            sql = "INSERT into servers_diskinfo(hostname_id, mount, available, total) VALUES(%s,%s,%s,%s)"
-            cursor.execute(sql, (hostname, mount, available, total))
-        elif lines == 1:
-            sql = "update servers_diskinfo set available=%s,  total=%s where hostname_id=%s and mount=%s"
-            cursor.execute(sql, (available, total,hostname,mount))
+    values = []
+    for (mount, info) in items.items():
+        if mount == "/dev/shm":
+            continue
+
+        available	= info.get('available', 0) if info.get('available', 0) else 0
+        total		= info.get('1K-blocks', 0) if info.get('1K-blocks', 0) else 0
+        values.append((hostname, mount, available, total))
+
+    if len(values) > 0 :
+        sql = "INSERT into servers_diskinfo(hostname_id, mount, available, total) VALUES(%s,%s,%s,%s)"
+        cursor.executemany(sql, values)
 
 # update network data
 def update_network(hostname, items, cursor, machine_exist):
@@ -120,26 +121,26 @@ def update_network(hostname, items, cursor, machine_exist):
         cursor.execute(sql, (hostname, errmsg))
         return
 
+    del_sql = "delete from servers_networkinfo where hostname_id=%s"
+    cursor.execute(del_sql, (hostname,))
+
+    values = []
     for (interface, info) in items.items():
-        if not info.has_key('inet') or not cmp(interface, 'lo'):
-            continue
+        # print hostname
+        if info.has_key('inet') and info.has_key('hwaddr') and cmp(interface, 'lo')<>0 and info['up'] and re.match(r'[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}', info['hwaddr']):
+            hwaddr =info.get('hwaddr', 'null')
+            ipaddr = ((info['inet'])[0])['address']
+            values.append((hostname, interface, hwaddr, ipaddr))
 
-        hwaddr =	info.get('hwaddr', '')
-        ipaddr =	((info['inet'])[0])['address']
-
-        lines       = cursor.execute("select hostname_id, interface from servers_networkinfo where hostname_id=%s and interface=%s", \
-                                 (hostname, interface,))
-        if lines == 0:
-            sql = "INSERT into servers_networkinfo(hostname_id, interface, hwaddr, ipaddr) VALUES(%s,%s,%s,%s)"
-            cursor.execute(sql, (hostname, interface, hwaddr, ipaddr))
-        elif lines == 1:
-            sql = "update servers_networkinfo set hwaddr=%s,  ipaddr=%s where hostname_id=%s and interface=%s"
-            cursor.execute(sql, (hwaddr, ipaddr, hostname,interface))
+    if len(values) > 0 :
+        sql = "INSERT into servers_networkinfo(hostname_id, interface, hwaddr, ipaddr) VALUES(%s,%s,%s,%s)"
+        cursor.executemany(sql, values)
 
 if __name__ == '__main__':
-    conn=MySQLdb.connect(host=host, port=port, user=user, passwd=password, db=db)
+    conn=MySQLdb.connect(host=host, port=port, user=user, passwd=password, db=db, charset='utf8')
     conn.autocommit(1)
     cursor = conn.cursor()
+    cursor.execute("TRUNCATE TABLE servers_errorinfo")
     machine_info = get_info()
     update_info(machine_info, cursor)
     conn.commit()
